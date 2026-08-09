@@ -1,0 +1,1324 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Speaking Practice</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    background: #0f1420;
+    color: #e8ebf2;
+    min-height: 100vh;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 16px; }
+  .card {
+    background: #171d2e;
+    border: 1px solid #2a3350;
+    border-radius: 12px;
+    padding: 18px;
+    margin-bottom: 14px;
+  }
+  h1 { font-size: 20px; margin: 0 0 4px 0; }
+  h2 { font-size: 16px; margin: 0 0 12px 0; color: #9db4ff; }
+  .banner-title {
+    background: linear-gradient(135deg, #ff8a4c, #ff6b6b);
+    color: #fff;
+    font-weight: 700;
+    font-size: 16px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    margin: 0 0 14px 0;
+  }
+  .banner-title-blue {
+    background: linear-gradient(135deg, #4c6fff, #7b5cff);
+  }
+  .btn-gradient-blue {
+    background: linear-gradient(135deg, #4c6fff, #7b5cff);
+    color: #fff;
+    border: none;
+  }
+  .btn-gradient-orange {
+    background: linear-gradient(135deg, #ff8a4c, #ff6b6b);
+    color: #fff;
+    border: none;
+  }
+  p.sub { color: #8891a8; margin: 0 0 20px 0; font-size: 14px; }
+  input[type=text], input[type=password], select {
+    background: #0f1420;
+    border: 1px solid #2a3350;
+    color: #e8ebf2;
+    border-radius: 8px;
+    padding: 12px;
+    width: 100%;
+    font-size: 15px;
+  }
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus {
+    -webkit-text-fill-color: #e8ebf2;
+    -webkit-box-shadow: 0 0 0px 1000px #0f1420 inset;
+    box-shadow: 0 0 0px 1000px #0f1420 inset;
+    transition: background-color 9999s ease-in-out 0s;
+  }
+  input:focus, select:focus { outline: 2px solid #4c6fff; border-color: #4c6fff; }
+  label { display: block; font-size: 13px; color: #9db4ff; margin-bottom: 6px; margin-top: 12px; }
+  button {
+    cursor: pointer;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 18px;
+    font-weight: 600;
+    font-size: 15px;
+  }
+  .btn-primary { background: #4c6fff; color: #fff; }
+  .btn-primary:disabled { background: #2a3350; color: #8891a8; cursor: not-allowed; }
+  .btn-secondary { background: #2a3350; color: #e8ebf2; }
+  .btn-sm { padding: 7px 12px; font-size: 13px; }
+  .hidden { display: none !important; }
+  .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .pwrow { position: relative; }
+  .pwrow input { padding-right: 40px; }
+  .pw-toggle {
+    position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+    background: none; border: none; padding: 4px; color: #8891a8; cursor: pointer;
+  }
+  #loginScreen, #setupScreen { max-width: 360px; margin: 60px auto; text-align: center; }
+  .file-input-label {
+    display: block;
+    border: 2px dashed #2a3350;
+    border-radius: 10px;
+    padding: 24px 12px;
+    text-align: center;
+    color: #9db4ff;
+    cursor: pointer;
+    margin-top: 6px;
+  }
+  .file-input-label.has-file { border-color: #4c6fff; color: #e8ebf2; }
+  #audioFileInput { display: none; }
+  .sub-item {
+    background: #0f1420;
+    border: 1px solid #232b45;
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 10px;
+    cursor: pointer;
+  }
+  .sub-item-header { display: flex; justify-content: space-between; align-items: center; }
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .badge-processing { background: #3a3220; color: #ffcf6b; }
+  .badge-graded { background: #1e3a2a; color: #7de3a0; }
+  .badge-invalid { background: #4a2030; color: #ff9db0; }
+  .badge-error { background: #4a2030; color: #ff9db0; }
+  .score-big { font-size: 22px; font-weight: 700; color: #9db4ff; }
+  .detail-box { margin-top: 12px; padding-top: 12px; border-top: 1px solid #232b45; font-size: 14px; line-height: 1.6; white-space: pre-wrap; }
+  .modal-bg {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+    display: flex; align-items: center; justify-content: center; z-index: 500; padding: 16px;
+  }
+  .modal-box { background: #171d2e; border: 1px solid #2a3350; border-radius: 12px; padding: 22px; max-width: 420px; width: 100%; }
+  .toast {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    background: #23305a; color: #e8ebf2; padding: 12px 20px; border-radius: 8px;
+    z-index: 999; max-width: 90%; text-align: center;
+  }
+  .muted { color: #8891a8; font-size: 13px; }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen" class="card hidden">
+  <h1>🎤 Speaking Practice</h1>
+  <p class="sub">Đăng nhập để nộp bài</p>
+  <label>Tài khoản</label>
+  <input type="text" id="loginUsername" placeholder="Tên đăng nhập" autocapitalize="off">
+  <label>Mật khẩu</label>
+  <div class="pwrow">
+    <input type="password" id="loginPassword" placeholder="Mật khẩu" onkeydown="if(event.key==='Enter')doLogin();">
+    <button type="button" class="pw-toggle" id="loginPwToggle" onclick="togglePw('loginPassword','loginPwToggle')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+    </button>
+  </div>
+  <button class="btn-primary" style="width:100%;margin-top:18px;" onclick="doLogin()">Đăng nhập</button>
+</div>
+
+<!-- MAIN -->
+<div id="mainApp" class="wrap hidden">
+  <div class="topbar">
+    <div>
+      <h1 id="welcomeName">🎤 Speaking Practice</h1>
+    </div>
+    <div class="row">
+      <button class="btn-secondary btn-sm" onclick="openChangePwModal()">Đổi MK</button>
+      <button class="btn-secondary btn-sm" onclick="doLogout()">Đăng xuất</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Nộp bài mới</h2>
+
+    <div class="hidden" id="assignmentBlock">
+      <p class="banner-title">📋 Các bài tập cần hoàn thành</p>
+      <select id="assignmentSelect" onchange="onAssignmentChange()"></select>
+      <button class="btn-gradient-blue btn-sm" id="toggleFreeModeBtn" style="margin-top:10px;padding:10px 16px;" onclick="toggleFreeMode(true)">Tự chọn nội dung luyện tập</button>
+    </div>
+
+    <div class="hidden" id="noAssignmentMessage" style="padding:16px;text-align:center;color:#8891a8;">
+      Hiện chưa có bài giao nào. Đợi giáo viên giao bài mới nộp được nhé.
+    </div>
+
+    <div id="freePracticeBlock" style="margin-top:16px;">
+      <p class="banner-title banner-title-blue" id="freePracticeLabel">Học sinh tự luyện</p>
+      <select id="freePracticeType" onchange="onFreePracticeTypeChange()">
+        <optgroup label="" id="freeOptgroupGeneral">
+          <option value="presentation">Thuyết trình theo tranh</option>
+          <option value="vocabulary">Luyện từ vựng</option>
+          <option value="reading">Luyện đọc</option>
+        </optgroup>
+        <optgroup label="" id="freeOptgroupIelts">
+          <option value="ielts_part1">IELTS Part 1 — Hỏi đáp cá nhân</option>
+          <option value="ielts_part2">IELTS Part 2 — Cue Card</option>
+          <option value="ielts_part3">IELTS Part 3 — Thảo luận sâu</option>
+        </optgroup>
+      </select>
+      <button class="btn-gradient-orange btn-sm hidden" id="backToAssignmentLink" style="margin-top:10px;padding:10px 16px;" onclick="toggleFreeMode(false)">« Quay lại làm theo bài giao</button>
+
+      <div id="freeImageBlock" style="margin-top:12px;">
+        <label>Đính kèm ảnh (tùy chọn — VD ảnh cần mô tả/so sánh, ảnh danh sách từ vựng, hoặc ảnh Cue Card)</label>
+        <label class="file-input-label" id="refImageLabel" for="refImageInput">🖼️ Bấm để chọn, dán (Ctrl+V) hoặc kéo thả ảnh vào đây</label>
+        <input type="file" id="refImageInput" accept="image/*" onchange="onRefImageSelected()">
+      </div>
+
+      <div id="freeReadingTextBlock" class="hidden" style="margin-top:12px;">
+        <label id="freeReadingTextLabel">Dán nội dung bài đang đọc (tùy chọn — có thì chấm chính xác hơn)</label>
+        <textarea id="freeReadingTextInput" rows="4" placeholder="Dán đoạn văn con đang đọc..."></textarea>
+      </div>
+    </div>
+    <div id="assignmentDescriptionPreview" class="hidden" style="margin-top:10px;padding:12px;background:#0f1420;border-radius:10px;border:1px solid #2a3350;max-height:220px;overflow-y:auto;">
+      <p id="assignmentDescriptionPreviewContent" style="margin:0;line-height:1.6;white-space:pre-wrap;"></p>
+    </div>
+    <div id="assignmentImagePreview" class="hidden" style="margin-top:10px;">
+      <p class="muted">Ảnh đề bài của bài giao này:</p>
+      <img id="assignmentImagePreviewImg" style="max-width:100%;border-radius:10px;">
+    </div>
+    <div id="readingTextPreview" class="hidden" style="margin-top:10px;padding:12px;background:#0f1420;border-radius:10px;border:1px solid #2a3350;max-height:220px;overflow-y:auto;">
+      <p class="muted" id="readingTextPreviewLabel" style="margin:0 0 6px 0;position:sticky;top:0;background:#0f1420;">Đọc đúng đoạn này:</p>
+      <p id="readingTextPreviewContent" style="margin:0;line-height:1.6;font-size:15px;white-space:pre-wrap;"></p>
+    </div>
+
+    <div id="audioSubmitBlock">
+      <div id="recordBlock" style="margin-top:20px;padding-top:16px;border-top:1px solid #232b45;">
+        <label>🎙️ Đọc/nói đúng nội dung ở trên, rồi ghi âm tại đây</label>
+        <div class="row" style="gap:10px;">
+          <button class="btn-primary" id="recordBtn" onclick="toggleRecording()">🎙️ Bắt đầu ghi âm</button>
+          <span id="recordTimer" class="muted hidden">00:00</span>
+        </div>
+        <div id="playbackBlock" class="hidden" style="margin-top:12px;">
+          <audio id="playbackAudio" controls style="width:100%;"></audio>
+          <button class="btn-secondary btn-sm" style="margin-top:8px;" onclick="reRecord()">🔁 Ghi lại</button>
+        </div>
+      </div>
+
+      <div style="margin-top:16px;">
+        <label>Hoặc chọn file ghi âm có sẵn trong máy</label>
+        <label class="file-input-label" id="fileLabel" for="audioFileInput">🎵 Bấm để chọn file ghi âm</label>
+        <input type="file" id="audioFileInput" accept="audio/*" onchange="onFileSelected()">
+      </div>
+
+      <div id="submitAlertBox" class="hidden" style="background:#fff;color:#111;padding:12px 14px;border-radius:8px;margin-bottom:12px;font-weight:600;text-align:center;"></div>
+      <button class="btn-primary" id="submitBtn" style="width:100%;margin-top:16px;" onclick="submitVideo()" disabled>Nộp bài</button>
+      <p class="muted" id="uploadStatus" style="margin-top:10px;"></p>
+    </div>
+
+    <div id="comprehensionQuizBlock" class="hidden" style="margin-top:16px;">
+      <div id="comprehensionContentBox" style="max-height:280px;overflow-y:auto;padding:12px;background:#0f1420;border-radius:10px;border:1px solid #2a3350;margin-bottom:14px;">
+        <audio id="comprehensionAudio" controls class="hidden" style="width:100%;margin-bottom:10px;"></audio>
+        <img id="comprehensionImage" class="hidden" style="max-width:100%;border-radius:8px;margin-bottom:10px;">
+        <p id="comprehensionPassageText" style="white-space:pre-wrap;line-height:1.6;margin:0;"></p>
+      </div>
+      <div id="comprehensionQuestionsBox"></div>
+      <button class="btn-primary" id="submitComprehensionBtn" style="width:100%;margin-top:16px;" onclick="submitComprehensionAnswers()">Nộp bài</button>
+      <div id="comprehensionResultBox" class="hidden" style="margin-top:16px;"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="row" style="justify-content:space-between;">
+      <h2 style="margin:0;">Bài đã nộp</h2>
+      <button class="btn-secondary btn-sm" onclick="loadSubmissions()">🔄 Kiểm tra ngay</button>
+    </div>
+    <p class="muted" style="margin-top:4px;">Bài "Đang chấm" sẽ tự động cập nhật, không cần bấm nút này.</p>
+    <div id="submissionsList" style="margin-top:14px;"></div>
+  </div>
+</div>
+
+<!-- MODAL: change password -->
+<div id="changePwModal" class="modal-bg hidden">
+  <div class="modal-box">
+    <h2>Đổi mật khẩu</h2>
+    <label>Mật khẩu mới</label>
+    <div class="pwrow">
+      <input type="password" id="newPwInput" placeholder="Nhập mật khẩu mới">
+      <button type="button" class="pw-toggle" id="newPwToggle" onclick="togglePw('newPwInput','newPwToggle')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
+    </div>
+    <div class="row" style="margin-top:16px;">
+      <button class="btn-secondary" onclick="closeChangePwModal()">Hủy</button>
+      <button class="btn-primary" onclick="saveNewPassword()">Lưu</button>
+    </div>
+  </div>
+</div>
+
+<div id="toastBox"></div>
+
+<script>
+var supabaseClient = null;
+var currentStudent = null; // { id, name, class_id }
+var currentAssignments = [];
+var selectedFile = null;
+var selectedRefImage = null;
+var autoRefreshTimer = null;
+var mediaRecorder = null;
+var recordedChunks = [];
+var recordTimerInterval = null;
+var recordSeconds = 0;
+var mediaStream = null;
+
+var eyeIcon = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>';
+var eyeOffIcon = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a18.6 18.6 0 0 1 4.22-5.19M9.9 4.24A10.4 10.4 0 0 1 12 4c7 0 11 7 11 7a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+
+function togglePw(inputId, btnId) {
+  var el = document.getElementById(inputId);
+  var btn = document.getElementById(btnId);
+  if (el.type === 'password') { el.type = 'text'; btn.innerHTML = eyeOffIcon; }
+  else { el.type = 'password'; btn.innerHTML = eyeIcon; }
+}
+
+// =====================================================
+// SETUP / CONNECT (gắn cứng sẵn - học sinh/phụ huynh không cần cấu hình gì)
+// =====================================================
+var SUPABASE_URL_FIXED = 'https://zeaawmjliuaycaqeseiq.supabase.co';
+var SUPABASE_ANON_KEY_FIXED = 'sb_publishable_itGD-6q_aH37BLqDfQUBCQ_-PjHWCJ_';
+
+function initApp() {
+  connectSupabase(SUPABASE_URL_FIXED, SUPABASE_ANON_KEY_FIXED);
+
+  var savedStudentId = localStorage.getItem('sp_student_id');
+  var savedStudentName = localStorage.getItem('sp_student_name');
+  var savedClassId = localStorage.getItem('sp_student_class_id');
+  var savedAudienceLevel = localStorage.getItem('sp_student_audience_level') || 'elementary';
+  if (savedStudentId) {
+    currentStudent = { id: savedStudentId, name: savedStudentName, class_id: savedClassId, audience_level: savedAudienceLevel };
+    showMainApp();
+  } else {
+    document.getElementById('loginScreen').classList.remove('hidden');
+  }
+}
+
+function connectSupabase(url, key) {
+  supabaseClient = supabase.createClient(url, key);
+}
+
+// =====================================================
+// AUTH
+// =====================================================
+function doLogin() {
+  var username = document.getElementById('loginUsername').value.trim();
+  var password = document.getElementById('loginPassword').value;
+  if (!username || !password) { showToast('Nhập đủ tài khoản và mật khẩu'); return; }
+
+  supabaseClient.from('sp_students').select('*').eq('username', username).maybeSingle()
+    .then(function(res) {
+      if (res.error) { showToast('Lỗi kết nối: ' + res.error.message); return; }
+      if (!res.data) { showToast('Không tìm thấy tài khoản'); return; }
+      if (res.data.password !== password) { showToast('Sai mật khẩu'); return; }
+
+      currentStudent = { id: res.data.id, name: res.data.name, class_id: res.data.class_id, audience_level: 'elementary' };
+      localStorage.setItem('sp_student_id', currentStudent.id);
+      localStorage.setItem('sp_student_name', currentStudent.name);
+      localStorage.setItem('sp_student_class_id', currentStudent.class_id || '');
+
+      if (currentStudent.class_id) {
+        supabaseClient.from('sp_classes').select('audience_level').eq('id', currentStudent.class_id).maybeSingle()
+          .then(function(cRes) {
+            currentStudent.audience_level = (cRes.data && cRes.data.audience_level) || 'elementary';
+            localStorage.setItem('sp_student_audience_level', currentStudent.audience_level);
+            showMainApp();
+          });
+      } else {
+        localStorage.setItem('sp_student_audience_level', 'elementary');
+        showMainApp();
+      }
+    });
+}
+
+function doLogout() {
+  localStorage.removeItem('sp_student_id');
+  localStorage.removeItem('sp_student_name');
+  localStorage.removeItem('sp_student_class_id');
+  localStorage.removeItem('sp_student_audience_level');
+  currentStudent = null;
+  document.getElementById('mainApp').classList.add('hidden');
+  document.getElementById('loginScreen').classList.remove('hidden');
+}
+
+function showMainApp() {
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('mainApp').classList.remove('hidden');
+  document.getElementById('welcomeName').textContent = '🎤 Chào ' + currentStudent.name;
+  loadSubmissions(); // tải trước để biết bài giao nào đã nộp rồi
+  loadAssignments();
+}
+
+function openChangePwModal() { document.getElementById('changePwModal').classList.remove('hidden'); }
+function closeChangePwModal() {
+  document.getElementById('changePwModal').classList.add('hidden');
+  document.getElementById('newPwInput').value = '';
+}
+function saveNewPassword() {
+  var newPw = document.getElementById('newPwInput').value.trim();
+  if (!newPw) { showToast('Nhập mật khẩu mới'); return; }
+  supabaseClient.from('sp_students').update({ password: newPw }).eq('id', currentStudent.id)
+    .then(function(res) {
+      if (res.error) { showToast('Lỗi: ' + res.error.message); return; }
+      showToast('Đã đổi mật khẩu');
+      closeChangePwModal();
+    });
+}
+
+// =====================================================
+// ASSIGNMENTS
+// =====================================================
+var submittedAssignmentIds = {};
+var useFreeMode = false;
+
+function loadAssignments() {
+  if (!currentStudent.class_id) return;
+
+  var byClass = supabaseClient.from('sp_assignment_classes')
+    .select('sp_assignments(*)')
+    .eq('class_id', currentStudent.class_id);
+
+  var byStudent = supabaseClient.from('sp_assignments')
+    .select('*')
+    .eq('student_id', currentStudent.id);
+
+  var excludedQuery = supabaseClient.from('sp_assignment_excluded_students')
+    .select('assignment_id')
+    .eq('student_id', currentStudent.id);
+
+  Promise.all([byClass, byStudent, excludedQuery]).then(function(results) {
+    var classRes = results[0];
+    var studentRes = results[1];
+    var excludedRes = results[2];
+    var merged = {};
+
+    if (!classRes.error) {
+      var classRows = classRes.data || [];
+      for (var i = 0; i < classRows.length; i++) {
+        if (classRows[i].sp_assignments) merged[classRows[i].sp_assignments.id] = classRows[i].sp_assignments;
+      }
+    }
+    if (!studentRes.error) {
+      var studentRows = studentRes.data || [];
+      for (var j = 0; j < studentRows.length; j++) {
+        merged[studentRows[j].id] = studentRows[j];
+      }
+    }
+
+    if (!excludedRes.error) {
+      var excludedRows = excludedRes.data || [];
+      for (var k = 0; k < excludedRows.length; k++) {
+        delete merged[excludedRows[k].assignment_id]; // bị loại trừ (nghỉ học) -> không hiện bài giao này
+      }
+    }
+
+    var list = Object.keys(merged).map(function(id) { return merged[id]; });
+    list.sort(function(a, b) { return new Date(b.created_at) - new Date(a.created_at); });
+    currentAssignments = list;
+    renderAssignmentDropdown();
+  });
+}
+
+function renderAssignmentDropdown() {
+  var sel = document.getElementById('assignmentSelect');
+  var currentValue = sel.value;
+
+  var undone = [];
+  var done = [];
+  for (var i = 0; i < currentAssignments.length; i++) {
+    var a = currentAssignments[i];
+    if (submittedAssignmentIds[a.id]) done.push(a);
+    else undone.push(a);
+  }
+  var sortedAssignments = undone.concat(done);
+
+  var html = '';
+  for (var j = 0; j < sortedAssignments.length; j++) {
+    var b = sortedAssignments[j];
+    var doneMark = submittedAssignmentIds[b.id] ? ' ✅ Đã nộp' : '';
+    html += '<option value="' + b.id + '">' + escapeHtml(b.topic) + doneMark + '</option>';
+  }
+  sel.innerHTML = html;
+  // giữ lại lựa chọn cũ nếu còn hợp lệ, không thì mặc định bài CHƯA làm đầu tiên
+  if (currentValue && html.indexOf('value="' + currentValue + '"') !== -1) {
+    sel.value = currentValue;
+  } else if (sortedAssignments.length > 0) {
+    sel.value = sortedAssignments[0].id;
+  }
+  applyModeVisibility();
+}
+
+function toggleFreeMode(toFree) {
+  useFreeMode = toFree;
+  applyModeVisibility();
+}
+
+function applyModeVisibility() {
+  var assignmentBlock = document.getElementById('assignmentBlock');
+  var freePracticeBlock = document.getElementById('freePracticeBlock');
+  var backLink = document.getElementById('backToAssignmentLink');
+  var toggleBtn = document.getElementById('toggleFreeModeBtn');
+  var noAssignmentMsg = document.getElementById('noAssignmentMessage');
+  var hasAssignments = currentAssignments.length > 0;
+  var isElementary = currentStudent.audience_level === 'elementary';
+
+  if (isElementary) {
+    // Khối Tiểu học: khóa hẳn tự luyện, chỉ làm được bài giao
+    useFreeMode = false;
+    freePracticeBlock.classList.add('hidden');
+    if (hasAssignments) {
+      assignmentBlock.classList.remove('hidden');
+      toggleBtn.classList.add('hidden');
+      noAssignmentMsg.classList.add('hidden');
+      renderAssignmentPreview();
+    } else {
+      assignmentBlock.classList.add('hidden');
+      noAssignmentMsg.classList.remove('hidden');
+    }
+    return;
+  }
+
+  toggleBtn.classList.remove('hidden');
+  noAssignmentMsg.classList.add('hidden');
+
+  if (hasAssignments && !useFreeMode) {
+    assignmentBlock.classList.remove('hidden');
+    freePracticeBlock.classList.add('hidden');
+    renderAssignmentPreview();
+  } else {
+    useFreeMode = true; // đảm bảo cờ luôn khớp với giao diện đang hiện, kể cả khi không có bài giao nào
+    assignmentBlock.classList.add('hidden');
+    freePracticeBlock.classList.remove('hidden');
+    backLink.classList.toggle('hidden', !hasAssignments);
+    clearAssignmentPreview();
+    applyAudienceToFreePractice();
+    onFreePracticeTypeChange();
+  }
+}
+
+function onAssignmentChange() {
+  renderAssignmentPreview();
+}
+
+function clearAssignmentPreview() {
+  document.getElementById('assignmentDescriptionPreview').classList.add('hidden');
+  document.getElementById('assignmentImagePreview').classList.add('hidden');
+  document.getElementById('readingTextPreview').classList.add('hidden');
+  document.getElementById('comprehensionQuizBlock').classList.add('hidden');
+  document.getElementById('audioSubmitBlock').classList.remove('hidden');
+  document.getElementById('submitAlertBox').classList.add('hidden');
+}
+
+function renderAssignmentPreview() {
+  var assignmentId = document.getElementById('assignmentSelect').value;
+  var descBlock = document.getElementById('assignmentDescriptionPreview');
+  var previewBlock = document.getElementById('assignmentImagePreview');
+  var readingBlock = document.getElementById('readingTextPreview');
+  var audioSubmitBlock = document.getElementById('audioSubmitBlock');
+  var comprehensionBlock = document.getElementById('comprehensionQuizBlock');
+
+  document.getElementById('submitAlertBox').classList.add('hidden');
+
+  var chosen = null;
+  for (var i = 0; i < currentAssignments.length; i++) {
+    if (currentAssignments[i].id === assignmentId) { chosen = currentAssignments[i]; break; }
+  }
+
+  var isComprehension = chosen && (chosen.type === 'listening' || chosen.type === 'reading_comprehension');
+  var alreadySubmitted = chosen && submittedAssignmentIds[chosen.id];
+
+  if (chosen && chosen.description) {
+    document.getElementById('assignmentDescriptionPreviewContent').textContent = chosen.description;
+    descBlock.classList.remove('hidden');
+  } else {
+    descBlock.classList.add('hidden');
+  }
+
+  if (isComprehension) {
+    // Bài Nghe hiểu/Đọc hiểu: ẩn hẳn khối ghi âm, chuyển sang giao diện làm bài trắc nghiệm/tự luận
+    previewBlock.classList.add('hidden');
+    readingBlock.classList.add('hidden');
+    audioSubmitBlock.classList.add('hidden');
+    comprehensionBlock.classList.remove('hidden');
+    loadComprehensionQuiz(chosen);
+    return;
+  }
+
+  comprehensionBlock.classList.add('hidden');
+
+  if (alreadySubmitted) {
+    // Đã nộp rồi -> báo ngay, không cho ghi âm mất công vô ích
+    audioSubmitBlock.classList.add('hidden');
+    var alertBox = document.getElementById('submitAlertBox');
+    alertBox.textContent = '⚠️ Bài này đã nộp rồi (đang chấm hoặc đã có điểm), không nộp lại được.';
+    alertBox.classList.remove('hidden');
+  } else {
+    audioSubmitBlock.classList.remove('hidden');
+  }
+
+  if (chosen && chosen.reference_image_url) {
+    document.getElementById('assignmentImagePreviewImg').src = chosen.reference_image_url;
+    previewBlock.classList.remove('hidden');
+  } else {
+    previewBlock.classList.add('hidden');
+  }
+
+  if (chosen && chosen.type === 'reading' && chosen.reading_text) {
+    document.getElementById('readingTextPreviewLabel').textContent = 'Đọc đúng đoạn này:';
+    document.getElementById('readingTextPreviewContent').textContent = chosen.reading_text;
+    readingBlock.classList.remove('hidden');
+  } else if (chosen && (chosen.type === 'ielts_part1' || chosen.type === 'ielts_part3') && chosen.questions_text) {
+    document.getElementById('readingTextPreviewLabel').textContent = 'Trả lời lần lượt các câu hỏi sau (ghi âm liên tục):';
+    document.getElementById('readingTextPreviewContent').textContent = chosen.questions_text;
+    readingBlock.classList.remove('hidden');
+  } else if (chosen && chosen.type === 'translation' && chosen.translation_vietnamese) {
+    document.getElementById('readingTextPreviewLabel').textContent = 'Nhìn các câu tiếng Việt sau, dịch nói sang tiếng Anh lần lượt (ghi âm liên tục):';
+    document.getElementById('readingTextPreviewContent').textContent = chosen.translation_vietnamese;
+    readingBlock.classList.remove('hidden');
+  } else {
+    readingBlock.classList.add('hidden');
+  }
+}
+
+function applyAudienceToFreePractice() {
+  var isIelts = currentStudent.audience_level === 'ielts';
+  var generalGroup = document.getElementById('freeOptgroupGeneral');
+  var ieltsGroup = document.getElementById('freeOptgroupIelts');
+  var sel = document.getElementById('freePracticeType');
+  var label = document.getElementById('freePracticeLabel');
+
+  generalGroup.style.display = isIelts ? 'none' : '';
+  ieltsGroup.style.display = isIelts ? '' : 'none';
+  sel.value = isIelts ? 'ielts_part2' : 'presentation';
+  label.textContent = 'Học sinh tự luyện';
+}
+
+function onFreePracticeTypeChange() {
+  var type = document.getElementById('freePracticeType').value;
+  var imageBlock = document.getElementById('freeImageBlock');
+  var readingTextBlock = document.getElementById('freeReadingTextBlock');
+  var readingLabel = document.getElementById('freeReadingTextLabel');
+  var readingInput = document.getElementById('freeReadingTextInput');
+
+  var needsTextInput = (type === 'reading' || type === 'ielts_part1' || type === 'ielts_part3');
+
+  if (needsTextInput) {
+    imageBlock.classList.add('hidden');
+    readingTextBlock.classList.remove('hidden');
+    if (type === 'reading') {
+      readingLabel.textContent = 'Dán nội dung bài đang đọc (tùy chọn — có thì chấm chính xác hơn)';
+      readingInput.placeholder = 'Dán đoạn văn con đang đọc...';
+    } else {
+      readingLabel.textContent = 'Câu hỏi đang trả lời (tùy chọn — có thì chấm chính xác hơn)';
+      readingInput.placeholder = 'VD: What do you usually do in your free time?';
+    }
+  } else {
+    imageBlock.classList.remove('hidden');
+    readingTextBlock.classList.add('hidden');
+  }
+}
+
+function onRefImageSelected() {
+  var input = document.getElementById('refImageInput');
+  if (input.files && input.files.length > 0) {
+    setRefImageFile(input.files[0]);
+  } else {
+    setRefImageFile(null);
+  }
+}
+
+function setRefImageFile(file) {
+  var label = document.getElementById('refImageLabel');
+  if (file) {
+    selectedRefImage = file;
+    label.textContent = '✅ ' + (file.name || 'ảnh đã dán');
+    label.classList.add('has-file');
+  } else {
+    selectedRefImage = null;
+    label.textContent = '🖼️ Bấm để chọn, dán (Ctrl+V) hoặc kéo thả ảnh vào đây';
+    label.classList.remove('has-file');
+  }
+}
+
+// Dán ảnh bằng Ctrl+V
+document.addEventListener('paste', function(e) {
+  var freeImageBlock = document.getElementById('freeImageBlock');
+  if (!freeImageBlock || freeImageBlock.offsetParent === null) return; // ẩn (kể cả do khối cha bị ẩn)
+  if (!e.clipboardData || !e.clipboardData.items) return;
+  for (var i = 0; i < e.clipboardData.items.length; i++) {
+    var item = e.clipboardData.items[i];
+    if (item.kind === 'file' && item.type.indexOf('image/') === 0) {
+      var file = item.getAsFile();
+      setRefImageFile(file);
+      showToast('Đã dán ảnh');
+      break;
+    }
+  }
+});
+
+// Kéo thả ảnh vào ô chọn ảnh
+(function setupRefImageDragDrop() {
+  function bind() {
+    var label = document.getElementById('refImageLabel');
+    if (!label) return;
+    label.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      label.style.borderColor = '#4c6fff';
+    });
+    label.addEventListener('dragleave', function(e) {
+      label.style.borderColor = '';
+    });
+    label.addEventListener('drop', function(e) {
+      e.preventDefault();
+      label.style.borderColor = '';
+      if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        setRefImageFile(e.dataTransfer.files[0]);
+      }
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bind);
+  } else {
+    bind();
+  }
+})();
+
+// =====================================================
+// GHI ÂM TRỰC TIẾP
+// =====================================================
+function pickRecorderMimeType() {
+  var candidates = ['audio/mp4', 'audio/webm', 'audio/ogg'];
+  for (var i = 0; i < candidates.length; i++) {
+    if (window.MediaRecorder && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(candidates[i])) {
+      return candidates[i];
+    }
+  }
+  return '';
+}
+
+function toggleRecording() {
+  var btn = document.getElementById('recordBtn');
+  if (mediaRecorder && mediaRecorder.state === 'recording') {
+    mediaRecorder.stop();
+    return;
+  }
+
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    showToast('Trình duyệt này không hỗ trợ ghi âm, hãy dùng cách chọn file bên dưới');
+    return;
+  }
+
+  navigator.mediaDevices.getUserMedia({ audio: true }).then(function(stream) {
+    mediaStream = stream;
+    recordedChunks = [];
+    var mimeType = pickRecorderMimeType();
+    var options = mimeType ? { mimeType: mimeType } : undefined;
+    try {
+      mediaRecorder = options ? new MediaRecorder(stream, options) : new MediaRecorder(stream);
+    } catch (e) {
+      mediaRecorder = new MediaRecorder(stream);
+    }
+
+    mediaRecorder.ondataavailable = function(e) {
+      if (e.data && e.data.size > 0) recordedChunks.push(e.data);
+    };
+
+    mediaRecorder.onstop = function() {
+      var blobType = mediaRecorder.mimeType || 'audio/webm';
+      var blob = new Blob(recordedChunks, { type: blobType });
+      var ext = blobType.indexOf('mp4') !== -1 ? 'm4a' : (blobType.indexOf('ogg') !== -1 ? 'ogg' : 'webm');
+      selectedFile = new File([blob], 'ghi_am_' + Date.now() + '.' + ext, { type: blobType });
+
+      var audioEl = document.getElementById('playbackAudio');
+      audioEl.src = URL.createObjectURL(blob);
+      document.getElementById('playbackBlock').classList.remove('hidden');
+      document.getElementById('submitBtn').disabled = false;
+
+      clearInterval(recordTimerInterval);
+      document.getElementById('recordTimer').classList.add('hidden');
+      btn.textContent = '🎙️ Bắt đầu ghi âm';
+
+      if (mediaStream) {
+        mediaStream.getTracks().forEach(function(t) { t.stop(); });
+        mediaStream = null;
+      }
+    };
+
+    mediaRecorder.start();
+    recordSeconds = 0;
+    document.getElementById('recordTimer').classList.remove('hidden');
+    document.getElementById('recordTimer').textContent = '00:00';
+    document.getElementById('playbackBlock').classList.add('hidden');
+    btn.textContent = '⏹️ Dừng ghi âm';
+    recordTimerInterval = setInterval(function() {
+      recordSeconds++;
+      var mm = String(Math.floor(recordSeconds / 60)).padStart(2, '0');
+      var ss = String(recordSeconds % 60).padStart(2, '0');
+      document.getElementById('recordTimer').textContent = mm + ':' + ss;
+    }, 1000);
+
+  }).catch(function(err) {
+    showToast('Không mở được micro, kiểm tra lại quyền truy cập micro cho trình duyệt nhé');
+  });
+}
+
+function reRecord() {
+  selectedFile = null;
+  document.getElementById('playbackBlock').classList.add('hidden');
+  document.getElementById('submitBtn').disabled = true;
+}
+
+// =====================================================
+// CHỌN FILE GHI ÂM CÓ SẴN
+// =====================================================
+function onFileSelected() {
+  var input = document.getElementById('audioFileInput');
+  var label = document.getElementById('fileLabel');
+  var btn = document.getElementById('submitBtn');
+  if (input.files && input.files.length > 0) {
+    selectedFile = input.files[0];
+    label.textContent = '✅ ' + selectedFile.name;
+    label.classList.add('has-file');
+    document.getElementById('playbackBlock').classList.add('hidden');
+    btn.disabled = false;
+  } else {
+    selectedFile = null;
+    label.textContent = '🎵 Bấm để chọn file ghi âm';
+    label.classList.remove('has-file');
+    btn.disabled = true;
+  }
+}
+
+function submitVideo() {
+  if (!selectedFile) { showToast('Chưa có bản ghi âm nào'); return; }
+  if (currentStudent.audience_level === 'elementary' && useFreeMode) {
+    showToast('Tài khoản này chỉ được làm bài giáo viên giao, không tự luyện tự do được');
+    return;
+  }
+  var assignmentId = useFreeMode ? null : (document.getElementById('assignmentSelect').value || null);
+  if (assignmentId && submittedAssignmentIds[assignmentId]) {
+    var alertBox = document.getElementById('submitAlertBox');
+    alertBox.textContent = '⚠️ Bài này đã nộp rồi (đang chấm hoặc đã có điểm), không nộp lại được.';
+    alertBox.classList.remove('hidden');
+    return;
+  }
+  var practiceType = useFreeMode ? document.getElementById('freePracticeType').value : null;
+  var needsTextCapture = practiceType === 'reading' || practiceType === 'ielts_part1' || practiceType === 'ielts_part3';
+  var freeReadingText = (useFreeMode && needsTextCapture)
+    ? document.getElementById('freeReadingTextInput').value.trim()
+    : null;
+  var statusEl = document.getElementById('uploadStatus');
+  var btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  statusEl.textContent = 'Đang tải lên... vui lòng không tắt trình duyệt';
+
+  var ext = selectedFile.name.split('.').pop();
+  var path = currentStudent.id + '/' + Date.now() + '.' + ext;
+
+  function finishInsert(fileUrl, refImageUrl) {
+    supabaseClient.from('sp_submissions').insert({
+      student_id: currentStudent.id,
+      assignment_id: assignmentId,
+      video_url: fileUrl,
+      video_path: path,
+      reference_image_url: refImageUrl || null,
+      practice_type: practiceType,
+      reading_text: freeReadingText || null,
+      status: 'processing'
+    }).then(function(insertRes) {
+      statusEl.textContent = '';
+      btn.disabled = false;
+      if (insertRes.error) {
+        showToast('Lỗi lưu bài nộp: ' + insertRes.error.message);
+        return;
+      }
+      showToast('Đã nộp bài! Đang chấm, bạn có thể quay lại xem sau.');
+      resetUploadForm();
+      loadSubmissions();
+    });
+  }
+
+  function uploadRefImageThen(fileUrl) {
+    if (!selectedRefImage || needsTextCapture) { finishInsert(fileUrl, null); return; }
+    var imgExt = selectedRefImage.name.split('.').pop();
+    var imgPath = currentStudent.id + '/' + Date.now() + '_ref.' + imgExt;
+    supabaseClient.storage.from('assignment-images').upload(imgPath, selectedRefImage)
+      .then(function(imgRes) {
+        if (imgRes.error) { finishInsert(fileUrl, null); return; }
+        var imgUrlRes = supabaseClient.storage.from('assignment-images').getPublicUrl(imgPath);
+        finishInsert(fileUrl, imgUrlRes.data.publicUrl);
+      });
+  }
+
+  supabaseClient.storage.from('speaking-videos').upload(path, selectedFile)
+    .then(function(uploadRes) {
+      if (uploadRes.error) {
+        statusEl.textContent = '';
+        console.error('Upload error (real reason):', uploadRes.error);
+        showToast('Hệ thống đang xử lý khối lượng bài lớn, vui lòng thử nộp lại sau ít phút nhé 🙏');
+        btn.disabled = false;
+        return;
+      }
+      var publicUrlRes = supabaseClient.storage.from('speaking-videos').getPublicUrl(path);
+      uploadRefImageThen(publicUrlRes.data.publicUrl);
+    });
+}
+
+function resetUploadForm() {
+  selectedFile = null;
+  document.getElementById('audioFileInput').value = '';
+  var label = document.getElementById('fileLabel');
+  label.textContent = '🎵 Bấm để chọn file ghi âm';
+  label.classList.remove('has-file');
+  document.getElementById('playbackBlock').classList.add('hidden');
+  document.getElementById('submitBtn').disabled = true;
+
+  selectedRefImage = null;
+  document.getElementById('refImageInput').value = '';
+  var refLabel = document.getElementById('refImageLabel');
+  refLabel.textContent = '🖼️ Bấm để chọn, dán (Ctrl+V) hoặc kéo thả ảnh vào đây';
+  refLabel.classList.remove('has-file');
+
+  var practiceTypeSel = document.getElementById('freePracticeType');
+  if (practiceTypeSel) practiceTypeSel.value = 'presentation';
+  var freeReadingInput = document.getElementById('freeReadingTextInput');
+  if (freeReadingInput) freeReadingInput.value = '';
+  onFreePracticeTypeChange();
+}
+
+// =====================================================
+// SUBMISSIONS LIST
+// =====================================================
+function loadSubmissions() {
+  var audioQuery = supabaseClient.from('sp_submissions').select('*, sp_scores(*), sp_assignments(type)').eq('student_id', currentStudent.id)
+    .order('submitted_at', { ascending: false });
+  var comprehensionQuery = supabaseClient.from('sp_comprehension_submissions').select('assignment_id').eq('student_id', currentStudent.id);
+
+  Promise.all([audioQuery, comprehensionQuery]).then(function(resArr) {
+    var res = resArr[0];
+    var compRes = resArr[1];
+    if (res.error) { showToast('Lỗi tải danh sách: ' + res.error.message); return; }
+    var list = res.data || [];
+    renderSubmissions(list);
+    scheduleAutoRefresh(list);
+
+    submittedAssignmentIds = {};
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].assignment_id) submittedAssignmentIds[list[i].assignment_id] = true;
+    }
+    if (!compRes.error) {
+      var compList = compRes.data || [];
+      for (var j = 0; j < compList.length; j++) {
+        submittedAssignmentIds[compList[j].assignment_id] = true;
+      }
+    }
+    renderAssignmentDropdown(); // luôn vẽ lại, tránh lỡ nhịp khi 2 lượt tải chạy song song
+  });
+}
+
+function scheduleAutoRefresh(list) {
+  if (autoRefreshTimer) { clearTimeout(autoRefreshTimer); autoRefreshTimer = null; }
+  var hasProcessing = false;
+  for (var i = 0; i < list.length; i++) {
+    if (list[i].status === 'processing') { hasProcessing = true; break; }
+  }
+  if (hasProcessing) {
+    autoRefreshTimer = setTimeout(function() {
+      loadSubmissions();
+    }, 15000);
+  }
+}
+
+var currentSubmissionsList = [];
+
+var expandedSubmissionIds = {};
+
+function renderSubmissions(list) {
+  currentSubmissionsList = list;
+  var box = document.getElementById('submissionsList');
+  if (list.length === 0) {
+    box.innerHTML = '<p class="muted">Chưa có bài nộp nào</p>';
+    return;
+  }
+  var html = '';
+  for (var i = 0; i < list.length; i++) {
+    var sub = list[i];
+    var score = null;
+    if (sub.sp_scores) {
+      score = Array.isArray(sub.sp_scores) ? sub.sp_scores[0] : sub.sp_scores;
+    }
+    var dateStr = formatDate(sub.submitted_at);
+
+    var effectiveType = 'presentation';
+    if (sub.sp_assignments && sub.sp_assignments.type) effectiveType = sub.sp_assignments.type;
+    else if (sub.practice_type) effectiveType = sub.practice_type;
+    var isIeltsSub = effectiveType.indexOf('ielts') === 0;
+
+    var isExpanded = !!expandedSubmissionIds[sub.id];
+    var deleteBtnHtml = sub.assignment_id ? '' : '<button class="btn-secondary btn-sm" onclick="event.stopPropagation();deleteSubmission(' + i + ')">Xóa</button>';
+    html += '<div class="sub-item" onclick="toggleDetail(\'' + sub.id + '\')">';
+    html += '<div class="sub-item-header">';
+    html += '<div><b>' + dateStr + '</b></div>';
+    html += '<div class="row" style="gap:8px;">' + statusBadge(sub.status) + deleteBtnHtml + '</div>';
+    html += '</div>';
+
+    if (sub.status === 'graded' && score) {
+      var scoreLabel = score.overall_score !== null ? score.overall_score : '-';
+      scoreLabel = isIeltsSub ? ('Band ' + scoreLabel) : (scoreLabel + '/10');
+      html += '<div style="margin-top:8px;" class="score-big">' + scoreLabel + '</div>';
+      html += '<div id="detail_' + sub.id + '" class="detail-box' + (isExpanded ? '' : ' hidden') + '">' + escapeHtml(addFeedbackIcons(score.detailed_feedback || '')) + '</div>';
+      if (isIeltsSub) {
+        html += '<button class="btn-secondary btn-sm" style="margin-top:10px;" onclick="event.stopPropagation();analyzeSubmissionDetailStudent(\'' + sub.id + '\', this)">📝 Xem transcript + bản nâng cấp</button>';
+        html += '<div id="analysisBox_' + sub.id + '" class="hidden" style="margin-top:12px;padding:12px;background:#0f1420;border-radius:10px;border:1px solid #2a3350;"></div>';
+      }
+    } else if (sub.status === 'invalid') {
+      html += '<div id="detail_' + sub.id + '" class="detail-box' + (isExpanded ? '' : ' hidden') + '">' + escapeHtml((score && score.invalid_reason) || 'Bài chưa đạt yêu cầu, vui lòng nộp lại.') + '</div>';
+    } else if (sub.status === 'processing') {
+      html += '<div class="muted" style="margin-top:8px;">Đang chấm, quay lại sau nhé...</div>';
+    } else {
+      html += '<div class="muted" style="margin-top:8px;">Có lỗi khi chấm bài này, thử nộp lại giúp mình nhé.</div>';
+    }
+    html += '</div>';
+  }
+  box.innerHTML = html;
+}
+
+function deleteSubmission(index) {
+  var sub = currentSubmissionsList[index];
+  if (!sub) return;
+  if (!confirm('Xóa bài nộp này? Không thể khôi phục lại.')) return;
+
+  var afterDbDelete = function() {
+    supabaseClient.from('sp_submissions').delete().eq('id', sub.id).then(function(res) {
+      if (res.error) { showToast('Lỗi xóa: ' + res.error.message); return; }
+      showToast('Đã xóa bài nộp');
+      loadSubmissions();
+    });
+  };
+
+  if (sub.video_path) {
+    supabaseClient.storage.from('speaking-videos').remove([sub.video_path]).then(function() {
+      afterDbDelete();
+    });
+  } else {
+    afterDbDelete();
+  }
+}
+
+function toggleDetail(submissionId) {
+  var el = document.getElementById('detail_' + submissionId);
+  if (!el) return;
+  el.classList.toggle('hidden');
+  expandedSubmissionIds[submissionId] = !el.classList.contains('hidden');
+}
+
+
+function analyzeSubmissionDetailStudent(submissionId, btn) {
+  var box = document.getElementById('analysisBox_' + submissionId);
+  btn.disabled = true;
+  btn.textContent = '⏳ Đang phân tích (có thể mất 30-60 giây)...';
+  box.classList.remove('hidden');
+  box.innerHTML = '<p class="muted">Đang gửi lên Gemini phân tích, vui lòng chờ...</p>';
+
+  supabaseClient.functions.invoke('analyze-submission', {
+    body: { submission_id: submissionId }
+  }).then(function(res) {
+    btn.disabled = false;
+    btn.textContent = '📝 Xem transcript + bản nâng cấp';
+    if (res.error) {
+      box.innerHTML = '<p style="color:#ff9db0;">Lỗi: ' + escapeHtml(res.error.message || String(res.error)) + '</p>';
+      return;
+    }
+    var payload = res.data;
+    if (!payload || payload.error) {
+      box.innerHTML = '<p style="color:#ff9db0;">Lỗi: ' + escapeHtml((payload && payload.error) || 'Không rõ lỗi') + '</p>';
+      return;
+    }
+    renderAnalysisResultStudent(box, payload.data);
+  }).catch(function(err) {
+    btn.disabled = false;
+    btn.textContent = '📝 Xem transcript + bản nâng cấp';
+    box.innerHTML = '<p style="color:#ff9db0;">Lỗi: ' + escapeHtml(String(err)) + '</p>';
+  });
+}
+
+function renderAnalysisResultStudent(box, data) {
+  if (!data) { box.innerHTML = '<p class="muted">Không có dữ liệu</p>'; return; }
+  var html = '';
+  html += '<p class="muted" style="margin:0 0 6px 0;">📄 Transcript (nguyên văn):</p>';
+  html += '<p style="margin:0 0 14px 0;font-style:italic;line-height:1.6;">' + escapeHtml(data.transcript || '') + '</p>';
+  html += '<p class="muted" style="margin:0 0 6px 0;">🇻🇳 Bản dịch:</p>';
+  html += '<p style="margin:0 0 14px 0;line-height:1.6;">' + escapeHtml(data.translation_vi || '') + '</p>';
+  html += '<p class="muted" style="margin:0 0 6px 0;">🔍 Phân tích lỗi chi tiết:</p>';
+  html += '<div style="margin:0 0 14px 0;white-space:pre-wrap;line-height:1.6;font-size:14px;">' + escapeHtml(data.detailed_analysis || '') + '</div>';
+  if (data.polished_version) {
+    html += '<p class="muted" style="margin:0 0 6px 0;">✨ Bản nâng cấp (giữ nguyên ý, nâng từ vựng/ngữ pháp):</p>';
+    html += '<div style="margin:0 0 14px 0;padding:12px;background:#171d2e;border-radius:8px;border:1px solid #4c6fff;white-space:pre-wrap;line-height:1.6;font-size:14px;">' + escapeHtml(data.polished_version) + '</div>';
+  }
+  if (data.key_phrases) {
+    html += '<p class="muted" style="margin:0 0 6px 0;">🌟 Từ/cụm từ mới đáng học:</p>';
+    html += '<div style="white-space:pre-wrap;line-height:1.6;font-size:14px;">' + escapeHtml(data.key_phrases) + '</div>';
+  }
+  box.innerHTML = html;
+}
+
+// =====================================================
+// NGHE HIỂU / ĐỌC HIỂU
+// =====================================================
+var currentComprehensionAssignment = null;
+var currentComprehensionQuestions = [];
+
+function loadComprehensionQuiz(assignment) {
+  currentComprehensionAssignment = assignment;
+
+  var audioEl = document.getElementById('comprehensionAudio');
+  var imgEl = document.getElementById('comprehensionImage');
+  var passageEl = document.getElementById('comprehensionPassageText');
+
+  if (assignment.content_audio_url) {
+    audioEl.src = assignment.content_audio_url;
+    audioEl.classList.remove('hidden');
+  } else {
+    audioEl.classList.add('hidden');
+  }
+  if (assignment.reference_image_url) {
+    imgEl.src = assignment.reference_image_url;
+    imgEl.classList.remove('hidden');
+  } else {
+    imgEl.classList.add('hidden');
+  }
+  passageEl.textContent = assignment.passage_text || '';
+
+  document.getElementById('comprehensionResultBox').classList.add('hidden');
+  document.getElementById('comprehensionQuestionsBox').innerHTML = '<p class="muted">Đang tải câu hỏi...</p>';
+  document.getElementById('submitComprehensionBtn').classList.remove('hidden');
+
+  // Kiểm tra đã làm bài này chưa
+  supabaseClient.from('sp_comprehension_submissions').select('*').eq('assignment_id', assignment.id).eq('student_id', currentStudent.id)
+    .maybeSingle().then(function(subRes) {
+      if (subRes.data) {
+        showComprehensionPastResult(subRes.data);
+      } else {
+        loadComprehensionQuestions(assignment.id);
+      }
+    });
+}
+
+function loadComprehensionQuestions(assignmentId) {
+  supabaseClient.functions.invoke('get-comprehension-questions', {
+    body: { assignment_id: assignmentId }
+  }).then(function(res) {
+    if (res.error) {
+      document.getElementById('comprehensionQuestionsBox').innerHTML = '<p style="color:#ff9db0;">Lỗi tải câu hỏi: ' + escapeHtml(res.error.message) + '</p>';
+      return;
+    }
+    var payload = res.data;
+    if (!payload || payload.error) {
+      document.getElementById('comprehensionQuestionsBox').innerHTML = '<p style="color:#ff9db0;">Lỗi: ' + escapeHtml((payload && payload.error) || 'Không rõ lỗi') + '</p>';
+      return;
+    }
+    currentComprehensionQuestions = payload.questions || [];
+    renderComprehensionQuestions();
+  });
+}
+
+function renderComprehensionQuestions() {
+  var box = document.getElementById('comprehensionQuestionsBox');
+  if (currentComprehensionQuestions.length === 0) {
+    box.innerHTML = '<p class="muted">Bài này chưa có câu hỏi</p>';
+    return;
+  }
+  var html = '';
+  for (var i = 0; i < currentComprehensionQuestions.length; i++) {
+    var q = currentComprehensionQuestions[i];
+    html += '<div style="margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid #232b45;">';
+    html += '<p style="font-weight:600;margin:0 0 8px 0;">Câu ' + (i + 1) + ': ' + escapeHtml(q.question_text) + '</p>';
+
+    if (q.question_type === 'multiple_choice') {
+      var opts = [['a', q.option_a], ['b', q.option_b], ['c', q.option_c], ['d', q.option_d]];
+      for (var o = 0; o < opts.length; o++) {
+        if (!opts[o][1]) continue;
+        html += '<label style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-weight:normal;cursor:pointer;">';
+        html += '<input type="radio" name="q_' + q.id + '" value="' + opts[o][0] + '" style="width:auto;">';
+        html += '<span>' + opts[o][0].toUpperCase() + '. ' + escapeHtml(opts[o][1]) + '</span>';
+        html += '</label>';
+      }
+    } else {
+      html += '<textarea id="answer_' + q.id + '" rows="2" placeholder="Nhập câu trả lời..."></textarea>';
+    }
+    html += '</div>';
+  }
+  box.innerHTML = html;
+}
+
+function submitComprehensionAnswers() {
+  if (currentComprehensionQuestions.length === 0) { showToast('Chưa có câu hỏi để nộp'); return; }
+
+  var answers = [];
+  for (var i = 0; i < currentComprehensionQuestions.length; i++) {
+    var q = currentComprehensionQuestions[i];
+    var ans = '';
+    if (q.question_type === 'multiple_choice') {
+      var checked = document.querySelector('input[name="q_' + q.id + '"]:checked');
+      ans = checked ? checked.value : '';
+    } else {
+      var ta = document.getElementById('answer_' + q.id);
+      ans = ta ? ta.value.trim() : '';
+    }
+    answers.push({ question_id: q.id, answer: ans });
+  }
+
+  var btn = document.getElementById('submitComprehensionBtn');
+  btn.disabled = true;
+  btn.textContent = 'Đang chấm bài...';
+
+  supabaseClient.functions.invoke('grade-comprehension', {
+    body: { assignment_id: currentComprehensionAssignment.id, student_id: currentStudent.id, answers: answers }
+  }).then(function(res) {
+    btn.disabled = false;
+    btn.textContent = 'Nộp bài';
+    if (res.error) { showToast('Lỗi: ' + res.error.message); return; }
+    var payload = res.data;
+    if (!payload || payload.error) { showToast('Lỗi: ' + ((payload && payload.error) || 'Không rõ lỗi')); return; }
+
+    showComprehensionResult(payload.total_score, payload.max_score, payload.results);
+    btn.classList.add('hidden');
+    loadSubmissions(); // để cập nhật dấu "Đã nộp"
+    loadAssignments();
+  }).catch(function(err) {
+    btn.disabled = false;
+    btn.textContent = 'Nộp bài';
+    showToast('Lỗi: ' + String(err));
+  });
+}
+
+function showComprehensionResult(totalScore, maxScore, results) {
+  var box = document.getElementById('comprehensionResultBox');
+  var resultMap = {};
+  for (var i = 0; i < results.length; i++) resultMap[results[i].question_id] = results[i];
+
+  var html = '<div class="score-big" style="margin-bottom:14px;">Điểm: ' + totalScore + '/' + maxScore + '</div>';
+  for (var j = 0; j < currentComprehensionQuestions.length; j++) {
+    var q = currentComprehensionQuestions[j];
+    var r = resultMap[q.id];
+    var icon = r && r.is_correct ? '✅' : '❌';
+    html += '<div style="margin-bottom:10px;">';
+    html += '<p style="margin:0;">' + icon + ' Câu ' + (j + 1) + ': ' + escapeHtml(q.question_text) + '</p>';
+    if (r && r.explanation) html += '<p class="muted" style="margin:4px 0 0 0;">' + escapeHtml(r.explanation) + '</p>';
+    html += '</div>';
+  }
+  box.innerHTML = html;
+  box.classList.remove('hidden');
+}
+
+function showComprehensionPastResult(submission) {
+  document.getElementById('comprehensionQuestionsBox').innerHTML = '<p class="muted">Bạn đã làm bài này rồi, đây là kết quả:</p>';
+  document.getElementById('submitComprehensionBtn').classList.add('hidden');
+
+  loadComprehensionQuestions(currentComprehensionAssignment.id);
+  setTimeout(function() {
+    showComprehensionResult(submission.total_score, submission.max_score, submission.results || []);
+  }, 600); // đợi câu hỏi tải xong để hiện đúng nội dung câu hỏi kèm kết quả
+}
+
+function statusBadge(status) {
+  if (status === 'graded') return '<span class="badge badge-graded">Đã chấm</span>';
+  if (status === 'invalid') return '<span class="badge badge-invalid">Không hợp lệ</span>';
+  if (status === 'processing') return '<span class="badge badge-processing">Đang chấm</span>';
+  return '<span class="badge badge-error">Lỗi</span>';
+}
+
+function formatDate(iso) {
+  var d = new Date(iso);
+  var dd = String(d.getDate()).padStart(2, '0');
+  var mm = String(d.getMonth() + 1).padStart(2, '0');
+  var yyyy = d.getFullYear();
+  var hh = String(d.getHours()).padStart(2, '0');
+  var mi = String(d.getMinutes()).padStart(2, '0');
+  return dd + '/' + mm + '/' + yyyy + ' ' + hh + ':' + mi;
+}
+
+// =====================================================
+// UTIL
+// =====================================================
+function addFeedbackIcons(text) {
+  if (!text) return text;
+  var iconMap = [
+    ['Nội dung:', '📝 Nội dung:'],
+    ['Từ vựng:', '📚 Từ vựng:'],
+    ['Ngữ pháp:', '✏️ Ngữ pháp:'],
+    ['Phát âm:', '🗣️ Phát âm:'],
+    ['Tự tin:', '💪 Tự tin:'],
+    ['Đọc đúng bài:', '📖 Đọc đúng bài:'],
+    ['Trôi chảy & Mạch lạc:', '🌊 Trôi chảy & Mạch lạc:'],
+    ['Trôi chảy:', '🌊 Trôi chảy:'],
+    ['Vốn từ vựng:', '📚 Vốn từ vựng:'],
+    ['Ngữ pháp (đa dạng & chính xác):', '✏️ Ngữ pháp (đa dạng & chính xác):'],
+    ['Lời khen:', '🌟 Lời khen:']
+  ];
+  var result = text;
+  for (var i = 0; i < iconMap.length; i++) {
+    var label = iconMap[i][0];
+    var replacement = iconMap[i][1];
+    var escapedLabel = label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    var regex = new RegExp('(^|\\n)' + escapedLabel, 'g');
+    result = result.replace(regex, function(match, p1) { return p1 + replacement; });
+  }
+  return result;
+}
+
+function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function showToast(msg) {
+  var box = document.getElementById('toastBox');
+  var el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = msg;
+  box.innerHTML = '';
+  box.appendChild(el);
+  setTimeout(function() { if (el.parentNode) el.parentNode.removeChild(el); }, 3500);
+}
+
+initApp();
+</script>
+</body>
+</html>

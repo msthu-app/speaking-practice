@@ -1,0 +1,2078 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Speaking Practice - Quản trị</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    background: #0f1420;
+    color: #e8ebf2;
+    min-height: 100vh;
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 20px; }
+  .card {
+    background: #171d2e;
+    border: 1px solid #2a3350;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  h1 { font-size: 22px; margin: 0 0 4px 0; }
+  h2 { font-size: 17px; margin: 0 0 12px 0; color: #9db4ff; }
+  p.sub { color: #8891a8; margin: 0 0 20px 0; font-size: 14px; }
+  input, select, textarea, button {
+    font-family: inherit;
+    font-size: 14px;
+  }
+  input[type=text], input[type=password], input[type=date], select, textarea {
+    background: #0f1420;
+    border: 1px solid #2a3350;
+    color: #e8ebf2;
+    border-radius: 8px;
+    padding: 10px 12px;
+    width: 100%;
+  }
+  input:focus, select:focus, textarea:focus { outline: 2px solid #4c6fff; border-color: #4c6fff; }
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus {
+    -webkit-text-fill-color: #e8ebf2;
+    -webkit-box-shadow: 0 0 0px 1000px #0f1420 inset;
+    box-shadow: 0 0 0px 1000px #0f1420 inset;
+    transition: background-color 9999s ease-in-out 0s;
+  }
+  .pwrow { position: relative; }
+  .pwrow input { padding-right: 40px; }
+  .pw-toggle {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    padding: 4px;
+    color: #8891a8;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  label { display: block; font-size: 13px; color: #9db4ff; margin-bottom: 6px; margin-top: 12px; }
+  button {
+    cursor: pointer;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-weight: 600;
+  }
+  .btn-primary { background: #4c6fff; color: #fff; }
+  .btn-primary:hover { background: #3a5ce0; }
+  .btn-secondary { background: #2a3350; color: #e8ebf2; }
+  .btn-secondary:hover { background: #363f5f; }
+  .btn-danger { background: #4a2030; color: #ff9db0; }
+  .btn-danger:hover { background: #5c2840; }
+  .btn-sm { padding: 6px 10px; font-size: 12px; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .grow { flex: 1; min-width: 160px; }
+  #loginScreen, #setupScreen {
+    max-width: 380px;
+    margin: 80px auto;
+    text-align: center;
+  }
+  .hidden { display: none !important; }
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+  th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid #232b45; font-size: 14px; }
+  th { color: #8891a8; font-weight: 600; font-size: 12px; text-transform: uppercase; }
+  .pill {
+    display: inline-block;
+    background: #23305a;
+    color: #9db4ff;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+  }
+  .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+  .tab-btn {
+    background: #171d2e;
+    color: #8891a8;
+    border: 1px solid #2a3350;
+    padding: 10px 18px;
+    border-radius: 8px;
+  }
+  .tab-btn.active { background: #4c6fff; color: #fff; border-color: #4c6fff; }
+  .file-input-label {
+    display: block;
+    border: 2px dashed #2a3350;
+    border-radius: 10px;
+    padding: 24px 12px;
+    text-align: center;
+    color: #9db4ff;
+    cursor: pointer;
+    margin-top: 6px;
+  }
+  .file-input-label.has-file { border-color: #4c6fff; color: #e8ebf2; }
+  #assignmentImageInput { display: none; }
+  #assignmentAudioInput { display: none; }
+  #questionImageInput { display: none; }
+  .credbox {
+    background: #0f1420;
+    border: 1px dashed #4c6fff;
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 10px;
+    font-size: 14px;
+  }
+  .toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #23305a;
+    color: #e8ebf2;
+    padding: 12px 20px;
+    border-radius: 8px;
+    z-index: 999;
+  }
+  .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+  .searchrow { margin-bottom: 14px; }
+  .muted { color: #8891a8; font-size: 13px; }
+  .modal-bg {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+    display: flex; align-items: center; justify-content: center; z-index: 500;
+  }
+  .modal-box {
+    background: #171d2e; border: 1px solid #2a3350; border-radius: 12px;
+    padding: 24px; max-width: 420px; width: 90%;
+  }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen" class="card hidden">
+  <h1>🎤 Speaking Practice</h1>
+  <p class="sub">Trang quản trị</p>
+  <label>Mật khẩu Admin</label>
+  <div class="pwrow">
+    <input type="password" id="loginPassword" placeholder="Nhập mật khẩu" onkeydown="if(event.key==='Enter')doLogin();">
+    <button type="button" class="pw-toggle" id="loginPasswordToggle" onclick="togglePw('loginPassword', 'loginPasswordToggle')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+    </button>
+  </div>
+  <button class="btn-primary" style="width:100%;margin-top:18px;" onclick="doLogin()">Đăng nhập</button>
+</div>
+
+<!-- MAIN APP -->
+<div id="mainApp" class="wrap hidden">
+  <div class="topbar">
+    <div>
+      <h1>🎤 Speaking Practice</h1>
+      <p class="sub" style="margin:0;">Trang quản trị</p>
+    </div>
+    <div class="row">
+      <button class="btn-secondary btn-sm" onclick="openChangePasswordModal()">Đổi mật khẩu</button>
+      <button class="btn-secondary btn-sm" onclick="doLogout()">Đăng xuất</button>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" id="tabBtnClasses" onclick="switchTab('classes')">Lớp học</button>
+    <button class="tab-btn" id="tabBtnStudents" onclick="switchTab('students')">Học sinh</button>
+    <button class="tab-btn" id="tabBtnAssignments" onclick="switchTab('assignments')">Bài giao</button>
+    <button class="tab-btn" id="tabBtnResults" onclick="switchTab('results')">Kết quả</button>
+  </div>
+
+  <!-- TAB: CLASSES -->
+  <div id="tabClasses">
+    <div class="card">
+      <h2>Thêm lớp mới</h2>
+      <div class="row">
+        <div class="grow">
+          <label>Tên lớp</label>
+          <input type="text" id="newClassName" placeholder="VD: Family and Friends 1 - Sáng T2-T4">
+        </div>
+        <div class="grow">
+          <label>Giáo trình</label>
+          <input type="text" id="newClassCurriculum" placeholder="VD: Family and Friends 1">
+        </div>
+      </div>
+      <label>Đối tượng (quyết định khung chấm + giọng nhận xét)</label>
+      <select id="newClassAudience">
+        <option value="elementary">Tiểu học</option>
+        <option value="middle">Cấp 2</option>
+        <option value="high">Cấp 3</option>
+        <option value="ielts">IELTS</option>
+      </select>
+      <button class="btn-primary" style="margin-top:14px;" onclick="addClass()">+ Thêm lớp</button>
+    </div>
+
+    <div class="card">
+      <h2>Danh sách lớp</h2>
+      <table>
+        <thead><tr><th>Tên lớp</th><th>Giáo trình</th><th>Đối tượng</th><th>Số học sinh</th><th></th></tr></thead>
+        <tbody id="classesTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TAB: STUDENTS -->
+  <div id="tabStudents" class="hidden">
+    <div class="card">
+      <h2>Chọn lớp</h2>
+      <select id="classSelect" onchange="loadStudents()"></select>
+    </div>
+
+    <div class="card">
+      <h2>Thêm học sinh (dán danh sách nhanh)</h2>
+      <p class="muted">Copy bảng học sinh từ Excel/Google Sheets/hocphi-manager rồi dán vào đây. Thứ tự cột: Tên | Ngày sinh | SĐT Zalo | Phụ huynh. Chỉ tạo tài khoản cho học sinh có đủ cả 4 thông tin.</p>
+      <textarea id="pasteArea" rows="4" placeholder="Dán danh sách vào đây..."></textarea>
+      <button class="btn-primary" style="margin-top:10px;" onclick="parsePastedList()">Xem trước</button>
+      <div id="pasteSkippedBox" class="hidden" style="margin-top:14px;color:#ffb86b;font-size:13px;"></div>
+      <div id="pastePreviewBox" class="hidden" style="margin-top:14px;">
+        <table>
+          <thead><tr><th>Tên</th><th>Ngày sinh</th><th>SĐT Zalo</th><th>Phụ huynh</th></tr></thead>
+          <tbody id="pastePreviewBody"></tbody>
+        </table>
+        <button class="btn-primary" style="margin-top:10px;" onclick="confirmBulkImport()">Tạo tài khoản cho tất cả</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row" style="justify-content:space-between;">
+        <h2 style="margin:0;">Danh sách học sinh</h2>
+        <div class="row">
+          <button class="btn-secondary btn-sm" onclick="addEmptyStudentRow()">+ Thêm hàng</button>
+          <button class="btn-primary btn-sm" onclick="saveAllStudents()">💾 Lưu tất cả</button>
+        </div>
+      </div>
+      <div class="searchrow" style="margin-top:14px;">
+        <input type="text" id="studentSearch" placeholder="Tìm theo tên..." oninput="renderStudentsTable()">
+      </div>
+      <table>
+        <thead><tr>
+          <th style="width:26px;">#</th>
+          <th>Tên học sinh *</th>
+          <th style="width:130px;">Ngày sinh</th>
+          <th style="width:130px;">SĐT Zalo</th>
+          <th>Phụ huynh</th>
+          <th>Tài khoản</th>
+          <th style="width:160px;">Chuyển lớp</th>
+          <th style="width:150px;"></th>
+        </tr></thead>
+        <tbody id="studentsTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TAB: ASSIGNMENTS -->
+  <div id="tabAssignments" class="hidden">
+    <div class="card">
+      <h2>Chọn khối</h2>
+      <select id="assignmentAudienceSelect" onchange="onAssignmentAudienceChange()">
+        <option value="elementary">Tiểu học</option>
+        <option value="middle">Cấp 2</option>
+        <option value="high">Cấp 3</option>
+        <option value="ielts">IELTS</option>
+      </select>
+      <p class="muted" id="assignmentClassAudienceNote" style="margin-top:8px;"></p>
+    </div>
+
+    <div class="card">
+      <h2>Chọn lớp áp dụng (tick 1 hoặc nhiều lớp trong khối này)</h2>
+      <div id="assignmentClassCheckboxes"></div>
+    </div>
+
+    <div class="card">
+      <h2>Loại trừ học sinh nghỉ học (tick những em không giao bài hôm nay)</h2>
+      <div id="excludeStudentsCheckboxes"><p class="muted">Chọn lớp ở trên trước để hiện danh sách học sinh</p></div>
+    </div>
+
+    <div class="card">
+      <h2>Tạo bài giao mới</h2>
+      <label>Loại bài</label>
+      <select id="newAssignmentType" onchange="onAssignmentTypeChange()">
+        <optgroup label="" id="optgroupGeneral">
+          <option value="presentation">Thuyết trình / nói câu hoàn chỉnh (chấm đủ: nội dung, từ vựng, ngữ pháp, phát âm, tự tin)</option>
+          <option value="vocabulary">Đọc từ vựng / từ đơn (chỉ chấm: từ vựng đúng, phát âm)</option>
+          <option value="reading">Luyện đọc theo bài mẫu (chấm: đọc đúng bài, phát âm, trôi chảy)</option>
+          <option value="translation">Dịch sang tiếng Anh (học sinh nghe câu tiếng Việt, dịch nói tiếng Anh)</option>
+        </optgroup>
+        <optgroup label="" id="optgroupIelts">
+          <option value="ielts_part1">IELTS Part 1 — Hỏi đáp cá nhân</option>
+          <option value="ielts_part2">IELTS Part 2 — Cue Card (nói độc thoại 1-2 phút)</option>
+          <option value="ielts_part3">IELTS Part 3 — Thảo luận sâu</option>
+        </optgroup>
+      </select>
+      <div id="readingTextBlock" class="hidden">
+        <label>Nội dung bài đọc mẫu (tùy chọn nếu đã đính ảnh bài đọc bên dưới — dán nguyên văn để Gemini đối chiếu)</label>
+        <textarea id="newAssignmentReadingText" rows="4" placeholder="Dán nguyên văn đoạn văn/mẫu câu học sinh cần đọc..."></textarea>
+      </div>
+      <div id="translationTextBlock" class="hidden">
+        <label>Danh sách câu dịch (mỗi dòng 1 cặp, đúng định dạng: Câu tiếng Việt - Câu tiếng Anh đúng)</label>
+        <textarea id="newAssignmentTranslationText" rows="6" placeholder="Con mèo đang ngủ. - The cat is sleeping.&#10;Tôi thích ăn táo. - I like eating apples."></textarea>
+        <p class="muted" style="margin-top:6px;">Câu tiếng Việt sẽ hiện cho học sinh xem, câu tiếng Anh giấu đi để AI chấm.</p>
+      </div>
+      <div id="questionsTextBlock" class="hidden">
+        <label>Danh sách câu hỏi (mỗi câu 1 dòng — học sinh sẽ đọc và trả lời lần lượt trong 1 lần ghi âm)</label>
+        <textarea id="newAssignmentQuestionsText" rows="5" placeholder="VD:&#10;What is your hometown like?&#10;Do you work or study?&#10;What do you usually do in your free time?"></textarea>
+      </div>
+
+      <label>Chủ đề <span class="muted" id="topicHintText">(VD: So sánh 2 bức tranh Unit 2 - Playtime)</span></label>
+      <input type="text" id="newAssignmentTopic" placeholder="VD: So sánh 2 bức tranh Unit 2 - Playtime">
+      <label>Mô tả thêm <span class="muted" id="descriptionHintText">(tùy chọn)</span></label>
+      <textarea id="newAssignmentDescription" rows="3" placeholder="Yêu cầu chi tiết cho học sinh..."></textarea>
+      <label>Tiêu chí chấm <span class="muted">(tùy chọn — VD: "yêu cầu nói tối thiểu 100 từ", để trống nếu không cần yêu cầu riêng)</span></label>
+      <textarea id="newAssignmentGradingCriteria" rows="2" placeholder="Để trống nếu không cần yêu cầu chấm riêng cho bài này..."></textarea>
+      <label>Hạn nộp (tùy chọn)</label>
+      <input type="date" id="newAssignmentDueDate">
+      <label>Ảnh đề bài (tùy chọn — VD ảnh 2 bức tranh cần so sánh, danh sách từ vựng, hoặc ảnh Cue Card)</label>
+      <label class="file-input-label" id="assignmentImageLabel" for="assignmentImageInput">🖼️ Bấm để chọn, dán (Ctrl+V) hoặc kéo thả ảnh vào đây</label>
+      <input type="file" id="assignmentImageInput" accept="image/*" onchange="onAssignmentImageSelected()">
+      <button class="btn-primary" style="margin-top:14px;" onclick="addAssignment()">+ Tạo bài giao</button>
+    </div>
+
+    <div class="card">
+      <h2>Danh sách bài giao</h2>
+      <div id="assignmentsListBox"></div>
+    </div>
+  </div>
+
+  <!-- TAB: RESULTS -->
+  <div id="tabResults" class="hidden">
+    <div class="card">
+      <h2>🔄 Chấm lại bài bị kẹt</h2>
+      <p class="muted">Dùng khi có bài báo "Đang chấm" mãi không xong (thường do hết hạn mức Gemini tạm thời). Bấm để quét và chấm lại toàn bộ bài bị kẹt trên 3 phút.</p>
+      <button class="btn-primary" id="retryStuckBtn" onclick="retryStuckGradings()">Chấm lại ngay</button>
+      <div id="retryStuckResultBox" style="margin-top:14px;"></div>
+    </div>
+
+    <div class="card">
+      <h2>Xem theo học sinh</h2>
+      <div class="row">
+        <div class="grow">
+          <label>Lớp</label>
+          <select id="resultsClassSelect" onchange="loadResultsStudents()"></select>
+        </div>
+        <div class="grow">
+          <label>Học sinh</label>
+          <select id="resultsStudentSelect" onchange="loadStudentResults()"></select>
+        </div>
+      </div>
+      <div id="studentResultsBox" style="margin-top:14px;"></div>
+    </div>
+
+    <div class="card">
+      <h2>Báo cáo tuần</h2>
+      <div class="row">
+        <div class="grow">
+          <label>Lớp</label>
+          <select id="weeklyReportClassSelect"></select>
+        </div>
+        <div class="grow">
+          <label>Chọn 1 ngày bất kỳ trong tuần cần xem</label>
+          <input type="date" id="weeklyReportWeekDate">
+        </div>
+      </div>
+      <div class="row" style="margin-top:14px;">
+        <button class="btn-primary" onclick="generateWeeklyReport()">Tạo báo cáo</button>
+        <button class="btn-secondary hidden" id="exportExcelBtn" onclick="exportWeeklyReportExcel()">📊 Xuất Excel</button>
+      </div>
+      <div id="weeklyReportBox" style="margin-top:14px;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: change password -->
+<div id="changePasswordModal" class="modal-bg hidden">
+  <div class="modal-box">
+    <h2>Đổi mật khẩu Admin</h2>
+    <label>Mật khẩu mới</label>
+    <div class="pwrow">
+      <input type="password" id="newAdminPassword" placeholder="Nhập mật khẩu mới">
+      <button type="button" class="pw-toggle" id="newAdminPasswordToggle" onclick="togglePw('newAdminPassword', 'newAdminPasswordToggle')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
+    </div>
+    <div class="row" style="margin-top:16px;">
+      <button class="btn-secondary" onclick="closeChangePasswordModal()">Hủy</button>
+      <button class="btn-primary" onclick="saveNewAdminPassword()">Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: edit assignment exclusions -->
+<div id="editExclusionsModal" class="modal-bg hidden">
+  <div class="modal-box">
+    <h2>Sửa danh sách loại trừ</h2>
+    <p class="muted">Tick học sinh không giao bài này (VD nghỉ học đột xuất, chưa tích kịp lúc tạo bài)</p>
+    <div id="editExclusionsListBox" style="max-height:320px;overflow-y:auto;margin-top:10px;"></div>
+    <div class="row" style="margin-top:16px;">
+      <button class="btn-secondary" onclick="closeEditExclusionsModal()">Hủy</button>
+      <button class="btn-primary" onclick="saveEditedExclusions()">Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: credentials display after adding a student -->
+<div id="credModal" class="modal-bg hidden">
+  <div class="modal-box">
+    <h2>Đã tạo tài khoản</h2>
+    <p class="muted">Copy gửi cho phụ huynh:</p>
+    <div class="credbox" id="credBoxContent"></div>
+    <button class="btn-primary" style="width:100%;margin-top:16px;" onclick="closeCredModal()">Đóng</button>
+  </div>
+</div>
+
+<div id="toastBox"></div>
+
+<script>
+// =====================================================
+// SETUP / SUPABASE CONNECTION
+// =====================================================
+var supabaseClient = null;
+var currentClasses = [];
+var currentStudents = [];
+var pendingBulkStudents = [];
+
+var SUPABASE_URL_FIXED = 'https://zeaawmjliuaycaqeseiq.supabase.co';
+var SUPABASE_ANON_KEY_FIXED = 'sb_publishable_itGD-6q_aH37BLqDfQUBCQ_-PjHWCJ_';
+
+function initApp() {
+  connectSupabase(SUPABASE_URL_FIXED, SUPABASE_ANON_KEY_FIXED);
+  if (sessionStorage.getItem('sp_admin_logged_in') === 'yes') {
+    showMainApp();
+  } else {
+    document.getElementById('loginScreen').classList.remove('hidden');
+  }
+}
+
+function connectSupabase(url, key) {
+  supabaseClient = supabase.createClient(url, key);
+}
+
+// =====================================================
+// AUTH
+// =====================================================
+function doLogin() {
+  var pw = document.getElementById('loginPassword').value;
+  supabaseClient.from('app_settings').select('value').eq('key', 'sp_admin_password').maybeSingle()
+    .then(function(res) {
+      if (res.error) {
+        showToast('Lỗi kết nối: ' + res.error.message);
+        return;
+      }
+      if (!res.data) {
+        showToast('Chưa có mật khẩu Admin trong bảng app_settings. Kiểm tra lại bảng trong Supabase (Table Editor).');
+        return;
+      }
+      if (res.data.value === pw) {
+        sessionStorage.setItem('sp_admin_logged_in', 'yes');
+        showMainApp();
+      } else {
+        showToast('Sai mật khẩu');
+      }
+    });
+}
+
+function doLogout() {
+  sessionStorage.removeItem('sp_admin_logged_in');
+  document.getElementById('mainApp').classList.add('hidden');
+  document.getElementById('loginScreen').classList.remove('hidden');
+}
+
+function showMainApp() {
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('mainApp').classList.remove('hidden');
+  loadClasses();
+}
+
+function openChangePasswordModal() {
+  document.getElementById('changePasswordModal').classList.remove('hidden');
+}
+function closeChangePasswordModal() {
+  document.getElementById('changePasswordModal').classList.add('hidden');
+  document.getElementById('newAdminPassword').value = '';
+}
+function saveNewAdminPassword() {
+  var newPw = document.getElementById('newAdminPassword').value.trim();
+  if (!newPw) { showToast('Nhập mật khẩu mới'); return; }
+  supabaseClient.from('app_settings').update({ value: newPw }).eq('key', 'sp_admin_password')
+    .then(function(res) {
+      if (res.error) { showToast('Lỗi: ' + res.error.message); return; }
+      showToast('Đã đổi mật khẩu');
+      closeChangePasswordModal();
+    });
+}
+
+// =====================================================
+// TABS
+// =====================================================
+function switchTab(tab) {
+  var classesTab = document.getElementById('tabClasses');
+  var studentsTab = document.getElementById('tabStudents');
+  var assignmentsTab = document.getElementById('tabAssignments');
+  var resultsTab = document.getElementById('tabResults');
+  var btnClasses = document.getElementById('tabBtnClasses');
+  var btnStudents = document.getElementById('tabBtnStudents');
+  var btnAssignments = document.getElementById('tabBtnAssignments');
+  var btnResults = document.getElementById('tabBtnResults');
+
+  classesTab.classList.add('hidden');
+  studentsTab.classList.add('hidden');
+  assignmentsTab.classList.add('hidden');
+  resultsTab.classList.add('hidden');
+  btnClasses.classList.remove('active');
+  btnStudents.classList.remove('active');
+  btnAssignments.classList.remove('active');
+  btnResults.classList.remove('active');
+
+  if (tab === 'classes') {
+    classesTab.classList.remove('hidden');
+    btnClasses.classList.add('active');
+  } else if (tab === 'students') {
+    studentsTab.classList.remove('hidden');
+    btnStudents.classList.add('active');
+    loadClasses();
+  } else if (tab === 'assignments') {
+    assignmentsTab.classList.remove('hidden');
+    btnAssignments.classList.add('active');
+    loadClassesForAssignments();
+  } else if (tab === 'results') {
+    resultsTab.classList.remove('hidden');
+    btnResults.classList.add('active');
+    loadResultsClasses();
+  }
+}
+
+// =====================================================
+// CLASSES
+// =====================================================
+function loadClasses() {
+  supabaseClient.from('sp_classes').select('*').order('created_at', { ascending: true })
+    .then(function(res) {
+      if (res.error) { showToast('Lỗi tải lớp: ' + res.error.message); return; }
+      currentClasses = res.data || [];
+      renderClasses();
+      renderClassDropdown();
+    });
+}
+
+function audienceLevelLabel(level) {
+  if (level === 'middle') return 'Cấp 2';
+  if (level === 'high') return 'Cấp 3';
+  if (level === 'ielts') return 'IELTS';
+  return 'Tiểu học';
+}
+
+function renderClasses() {
+  var tbody = document.getElementById('classesTableBody');
+  var html = '';
+  for (var i = 0; i < currentClasses.length; i++) {
+    var c = currentClasses[i];
+    html += '<tr>';
+    html += '<td>' + escapeHtml(c.name) + '</td>';
+    html += '<td>' + escapeHtml(c.curriculum || '-') + '</td>';
+    html += '<td>';
+    html += '<select onchange="updateClassAudience(\'' + c.id + '\', this.value)" style="width:auto;padding:6px 8px;">';
+    html += '<option value="elementary"' + (c.audience_level === 'elementary' || !c.audience_level ? ' selected' : '') + '>Tiểu học</option>';
+    html += '<option value="middle"' + (c.audience_level === 'middle' ? ' selected' : '') + '>Cấp 2</option>';
+    html += '<option value="high"' + (c.audience_level === 'high' ? ' selected' : '') + '>Cấp 3</option>';
+    html += '<option value="ielts"' + (c.audience_level === 'ielts' ? ' selected' : '') + '>IELTS</option>';
+    html += '</select>';
+    html += '</td>';
+    html += '<td id="classCount_' + c.id + '">...</td>';
+    html += '<td><button class="btn-danger btn-sm" onclick="deleteClass(\'' + c.id + '\')">Xóa</button></td>';
+    html += '</tr>';
+  }
+  tbody.innerHTML = html;
+  for (var j = 0; j < currentClasses.length; j++) {
+    countStudentsInClass(currentClasses[j].id);
+  }
+}
+
+function updateClassAudience(classId, newLevel) {
+  supabaseClient.from('sp_classes').update({ audience_level: newLevel }).eq('id', classId)
+    .then(function(res) {
+      if (res.error) { showToast('Lỗi: ' + res.error.message); return; }
+      showToast('Đã cập nhật đối tượng lớp thành ' + audienceLevelLabel(newLevel));
+      loadClasses();
+    });
+}
+
+function countStudentsInClass(classId) {
+  supabaseClient.from('sp_students').select('id', { count: 'exact', head: true }).eq('class_id', classId)
+    .then(function(res) {
+      var el = document.getElementById('classCount_' + classId);
+      if (el) el.textContent = res.count !== null ? res.count : '0';
+    });
+}
+
+function renderClassDropdown() {
+  var sel = document.getElementById('classSelect');
+  var html = '';
+  for (var i = 0; i < currentClasses.length; i++) {
+    html += '<option value="' + currentClasses[i].id + '">' + escapeHtml(currentClasses[i].name) + ' — ' + audienceLevelLabel(currentClasses[i].audience_level) + '</option>';
+  }
+  sel.innerHTML = html;
+  if (currentClasses.length > 0) loadStudents();
+}
+
+function addClass() {
+  var name = document.getElementById('newClassName').value.trim();
+  var curriculum = document.getElementById('newClassCurriculum').value.trim();
+  var audienceLevel = document.getElementById('newClassAudience').value;
+  if (!name) { showToast('Nhập tên lớp'); return; }
+  supabaseClient.from('sp_classes').insert({ name: name, curriculum: curriculum, audience_level: audienceLevel })
+    .then(function(res) {
+      if (res.error) { showToast('Lỗi: ' + res.error.message); return; }
+      document.getElementById('newClassName').value = '';
+      document.getElementById('newClassCurriculum').value = '';
+      showToast('Đã thêm lớp');
+      loadClasses();
+    });
+}
+
+function deleteClass(id) {
+  if (!confirm('Xóa lớp này? Học sinh trong lớp sẽ không còn thuộc lớp nào.')) return;
+  supabaseClient.from('sp_classes').delete().eq('id', id)
+    .then(function(res) {
+      if (res.error) { showToast('Lỗi: ' + res.error.message); return; }
+      showToast('Đã xóa lớp');
+      loadClasses();
+    });
+}
+
+// =====================================================
+// STUDENTS
+// =====================================================
+function isoToDisplayDate(iso) {
+  if (!iso) return '';
+  var parts = iso.split('-');
+  if (parts.length !== 3) return '';
+  return parts[2] + '/' + parts[1] + '/' + parts[0];
+}
+
+function loadStudents() {
+  var classId = document.getElementById('classSelect').value;
+  if (!classId) { currentStudents = []; renderStudentsTable(); return; }
+  supabaseClient.from('sp_students').select('*').eq('class_id', classId).order('name', { ascending: true })
+    .then(function(res) {
+      if (res.error) { showToast('Lỗi tải học sinh: ' + res.error.message); return; }
+      var rows = res.data || [];
+      currentStudents = [];
+      for (var i = 0; i < rows.length; i++) {
+        currentStudents.push({
+          id: rows[i].id,
+          name: rows[i].name,
+          dobDisplay: isoToDisplayDate(rows[i].dob),
+          parent_name: rows[i].parent_name || '',
+          parent_phone: rows[i].parent_phone || '',
+          username: rows[i].username
+        });
+      }
+      renderStudentsTable();
+    });
+}
+
+var autoSaveTimers = {};
+
+function updateStudentField(index, field, value) {
+  if (!currentStudents[index]) return;
+  currentStudents[index][field] = value;
+  if (autoSaveTimers[index]) clearTimeout(autoSaveTimers[index]);
+  autoSaveTimers[index] = setTimeout(function() {
+    autoSaveStudentRow(index);
+  }, 900);
+}
+
+function autoSaveStudentRow(index) {
+  var classId = document.getElementById('classSelect').value;
+  var s = currentStudents[index];
+  if (!s || !classId) return;
+  if (!s.name || !s.name.trim()) return; // chưa có tên thì chưa lưu
+
+  var dobIso = convertDateToIso(s.dobDisplay);
+
+  if (s.id) {
+    var usernameToSave = (s.username || '').trim();
+    if (!usernameToSave) return; // không cho lưu tên tài khoản rỗng
+
+    supabaseClient.from('sp_students').update({
+      name: s.name.trim(),
+      dob: dobIso,
+      parent_name: s.parent_name || null,
+      parent_phone: s.parent_phone || null,
+      username: usernameToSave
+    }).eq('id', s.id).then(function(res) {
+      if (res.error) {
+        if (res.error.code === '23505') {
+          showToast('Tên tài khoản này đã có người dùng, chọn tên khác nhé');
+        } else {
+          showToast('Lỗi lưu: ' + res.error.message);
+        }
+      }
+    });
+  } else {
+    if (s._saving) return; // tránh tạo trùng nếu đang lưu dở
+    s._saving = true;
+    generateUniqueUsername(s.name, function(username) {
+      var record = {
+        class_id: classId,
+        name: s.name.trim(),
+        username: username,
+        password: '123456',
+        dob: dobIso,
+        parent_name: s.parent_name || null,
+        parent_phone: s.parent_phone || null
+      };
+      supabaseClient.from('sp_students').insert(record).select().single().then(function(res) {
+        s._saving = false;
+        if (res.error) { showToast('Lỗi lưu: ' + res.error.message); return; }
+        s.id = res.data.id;
+        s.username = res.data.username;
+        var userCell = document.getElementById('studentUsernameCell_' + index);
+        var actionsCell = document.getElementById('studentActionsCell_' + index);
+        if (userCell) userCell.innerHTML = '<span class="pill">' + escapeHtml(s.username) + '</span>';
+        if (actionsCell) {
+          actionsCell.innerHTML = '<button class="btn-secondary btn-sm" onclick="resetStudentPassword(\'' + s.id + '\')">Reset MK</button> <button class="btn-danger btn-sm" onclick="deleteStudentRow(' + index + ')">Xóa</button>';
+        }
+        showToast('Đã tạo tài khoản ' + s.name.trim() + ': ' + username + ' / 123456');
+      });
+    });
+  }
+}
+
+function addEmptyStudentRow() {
+  currentStudents.push({ id: null, name: '', dobDisplay: '', parent_name: '', parent_phone: '', username: '' });
+  renderStudentsTable();
+}
+
+function renderStudentsTable() {
+  var searchVal = document.getElementById('studentSearch').value.toLowerCase();
+  var tbody = document.getElementById('studentsTableBody');
+  var html = '';
+  var shown = 0;
+  for (var i = 0; i < currentStudents.length; i++) {
+    var s = currentStudents[i];
+    if (searchVal && s.name.toLowerCase().indexOf(searchVal) === -1) continue;
+    shown++;
+    html += '<tr id="studentRow_' + i + '">';
+    html += '<td class="muted">' + shown + '</td>';
+    html += '<td><input type="text" value="' + escapeHtml(s.name) + '" placeholder="Tên học sinh *" oninput="updateStudentField(' + i + ',\'name\',this.value)"></td>';
+    html += '<td><input type="text" value="' + escapeHtml(s.dobDisplay) + '" placeholder="dd/mm/yyyy" oninput="updateStudentField(' + i + ',\'dobDisplay\',this.value)"></td>';
+    html += '<td><input type="text" value="' + escapeHtml(s.parent_phone) + '" placeholder="0912xxxxxx" oninput="updateStudentField(' + i + ',\'parent_phone\',this.value)"></td>';
+    html += '<td><input type="text" value="' + escapeHtml(s.parent_name) + '" placeholder="Tên PH" oninput="updateStudentField(' + i + ',\'parent_name\',this.value)"></td>';
+    html += '<td id="studentUsernameCell_' + i + '">' + (s.id ? '<input type="text" value="' + escapeHtml(s.username) + '" oninput="updateStudentField(' + i + ',\'username\',this.value)" style="width:130px;">' : '<span class="muted">Chưa lưu</span>') + '</td>';
+    html += '<td>';
+    if (s.id) {
+      html += '<select onchange="transferStudentClass(\'' + s.id + '\', this.value)" style="width:auto;padding:6px 8px;">';
+      for (var k = 0; k < currentClasses.length; k++) {
+        var cls = currentClasses[k];
+        var isCurrent = document.getElementById('classSelect').value === cls.id;
+        html += '<option value="' + cls.id + '"' + (isCurrent ? ' selected' : '') + '>' + escapeHtml(cls.name) + '</option>';
+      }
+      html += '</select>';
+    } else {
+      html += '<span class="muted">—</span>';
+    }
+    html += '</td>';
+    html += '<td id="studentActionsCell_' + i + '">';
+    if (s.id) html += '<button class="btn-secondary btn-sm" onclick="resetStudentPassword(\'' + s.id + '\')">Reset MK</button> ';
+    html += '<button class="btn-danger btn-sm" onclick="deleteStudentRow(' + i + ')">Xóa</button>';
+    html += '</td>';
+    html += '</tr>';
+  }
+  if (html === '') html = '<tr><td colspan="7" class="muted">Chưa có học sinh nào, bấm "+ Thêm hàng" để bắt đầu</td></tr>';
+  tbody.innerHTML = html;
+}
+
+function slugifyName(name) {
+  var s = name.toLowerCase();
+  s = s.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, 'a');
+  s = s.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, 'e');
+  s = s.replace(/ì|í|ị|ỉ|ĩ/g, 'i');
+  s = s.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, 'o');
+  s = s.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, 'u');
+  s = s.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, 'y');
+  s = s.replace(/đ/g, 'd');
+  s = s.replace(/[^a-z0-9\s]/g, '');
+  s = s.trim().replace(/\s+/g, '');
+  return s;
+}
+
+function generateUniqueUsername(baseName, callback) {
+  var base = slugifyName(baseName);
+  if (!base) base = 'hocsinh';
+  supabaseClient.from('sp_students').select('username').ilike('username', base + '%')
+    .then(function(res) {
+      var existing = {};
+      if (res.data) {
+        for (var i = 0; i < res.data.length; i++) existing[res.data[i].username] = true;
+      }
+      var candidate = base;
+      var n = 2;
+      while (existing[candidate]) {
+        candidate = base + n;
+        n++;
+      }
+      callback(candidate);
+    });
+}
+
+function saveAllStudents() {
+  var classId = document.getElementById('classSelect').value;
+  if (!classId) { showToast('Chưa chọn lớp'); return; }
+  var newlyCreated = [];
+  saveStudentAtIndex(0, classId, newlyCreated);
+}
+
+function saveStudentAtIndex(index, classId, newlyCreated) {
+  if (index >= currentStudents.length) {
+    showToast('Đã lưu xong');
+    if (newlyCreated.length > 0) showCredModalList(newlyCreated);
+    loadStudents();
+    return;
+  }
+  var s = currentStudents[index];
+  if (!s.name || !s.name.trim()) {
+    saveStudentAtIndex(index + 1, classId, newlyCreated);
+    return;
+  }
+  var dobIso = convertDateToIso(s.dobDisplay);
+  if (s.id) {
+    // update existing
+    var usernameToSave = (s.username || '').trim();
+    supabaseClient.from('sp_students').update({
+      name: s.name.trim(),
+      dob: dobIso,
+      parent_name: s.parent_name || null,
+      parent_phone: s.parent_phone || null,
+      username: usernameToSave || s.username
+    }).eq('id', s.id).then(function(res) {
+      if (res.error) {
+        if (res.error.code === '23505') showToast('Tên tài khoản trùng cho học sinh "' + s.name + '", chưa lưu được tên tài khoản này');
+        else showToast('Lỗi lưu "' + s.name + '": ' + res.error.message);
+      }
+      saveStudentAtIndex(index + 1, classId, newlyCreated);
+    });
+  } else {
+    // insert new
+    generateUniqueUsername(s.name, function(username) {
+      var record = {
+        class_id: classId,
+        name: s.name.trim(),
+        username: username,
+        password: '123456',
+        dob: dobIso,
+        parent_name: s.parent_name || null,
+        parent_phone: s.parent_phone || null
+      };
+      supabaseClient.from('sp_students').insert(record).then(function(res) {
+        if (!res.error) newlyCreated.push({ name: s.name.trim(), username: username, password: '123456' });
+        saveStudentAtIndex(index + 1, classId, newlyCreated);
+      });
+    });
+  }
+}
+
+function deleteStudentRow(index) {
+  var s = currentStudents[index];
+  if (!s.id) {
+    // unsaved row, just remove locally
+    currentStudents.splice(index, 1);
+    renderStudentsTable();
+    return;
+  }
+  if (!confirm('Xóa học sinh này? Toàn bộ bài nộp/điểm liên quan cũng sẽ bị xóa.')) return;
+  supabaseClient.from('sp_students').delete().eq('id', s.id)
+    .then(function(res) {
+      if (res.error) { showToast('Lỗi: ' + res.error.message); return; }
+      showToast('Đã xóa học sinh');
+      loadStudents();
+    });
+}
+
+function transferStudentClass(studentId, newClassId) {
+  if (!confirm('Chuyển học sinh này sang lớp khác? Toàn bộ lịch sử bài nộp/điểm sẽ được giữ nguyên.')) {
+    renderStudentsTable(); // hủy thao tác, vẽ lại dropdown về đúng lớp cũ
+    return;
+  }
+  supabaseClient.from('sp_students').update({ class_id: newClassId }).eq('id', studentId)
+    .then(function(res) {
+      if (res.error) { showToast('Lỗi chuyển lớp: ' + res.error.message); return; }
+      showToast('Đã chuyển lớp thành công');
+      loadStudents(); // học sinh biến mất khỏi danh sách lớp cũ, load lại đúng lớp đang chọn
+    });
+}
+
+function resetStudentPassword(id) {
+  if (!confirm('Đặt lại mật khẩu về 123456?')) return;
+  supabaseClient.from('sp_students').update({ password: '123456' }).eq('id', id)
+    .then(function(res) {
+      if (res.error) { showToast('Lỗi: ' + res.error.message); return; }
+      showToast('Đã reset mật khẩu về 123456');
+    });
+}
+
+function showCredModalList(list) {
+  var box = document.getElementById('credBoxContent');
+  var html = '';
+  for (var i = 0; i < list.length; i++) {
+    html += '<div style="margin-bottom:10px;"><b>' + escapeHtml(list[i].name) + '</b><br>Tài khoản: <b>' + escapeHtml(list[i].username) + '</b> | Mật khẩu: <b>' + escapeHtml(list[i].password) + '</b></div>';
+  }
+  box.innerHTML = html;
+  document.getElementById('credModal').classList.remove('hidden');
+}
+function closeCredModal() {
+  document.getElementById('credModal').classList.add('hidden');
+}
+
+// =====================================================
+// BULK PASTE IMPORT
+// =====================================================
+function parsePastedList() {
+  var raw = document.getElementById('pasteArea').value;
+  var lines = raw.split('\n');
+  pendingBulkStudents = [];
+  var previewHtml = '';
+  var skippedNames = [];
+  for (var i = 0; i < lines.length; i++) {
+    var line = lines[i].replace(/\r/g, '');
+    if (!line.trim()) continue;
+    var cols = line.split('\t');
+    var name = (cols[0] || '').trim();
+    var dobRaw = (cols[1] || '').trim();
+    var phone = (cols[2] || '').trim();
+    var parentName = (cols[3] || '').trim();
+    if (!name) continue;
+    if (/^ten\s*(hoc\s*sinh)?$/i.test(slugifyName(name))) continue; // skip header row
+
+    if (!dobRaw || !phone || !parentName) {
+      skippedNames.push(name);
+      continue;
+    }
+
+    var dobIso = convertDateToIso(dobRaw);
+    pendingBulkStudents.push({ name: name, dob: dobIso, phone: phone, parentName: parentName });
+
+    previewHtml += '<tr>';
+    previewHtml += '<td>' + escapeHtml(name) + '</td>';
+    previewHtml += '<td>' + escapeHtml(dobRaw) + '</td>';
+    previewHtml += '<td>' + escapeHtml(phone) + '</td>';
+    previewHtml += '<td>' + escapeHtml(parentName) + '</td>';
+    previewHtml += '</tr>';
+  }
+
+  var skippedBox = document.getElementById('pasteSkippedBox');
+  if (skippedNames.length > 0) {
+    skippedBox.textContent = '⚠️ Bỏ qua ' + skippedNames.length + ' học sinh thiếu thông tin (chưa đủ ngày sinh/SĐT/phụ huynh): ' + skippedNames.join(', ');
+    skippedBox.classList.remove('hidden');
+  } else {
+    skippedBox.classList.add('hidden');
+  }
+
+  if (pendingBulkStudents.length === 0) {
+    showToast('Không có học sinh nào đủ thông tin để tạo tài khoản');
+    document.getElementById('pastePreviewBox').classList.add('hidden');
+    return;
+  }
+  document.getElementById('pastePreviewBody').innerHTML = previewHtml;
+  document.getElementById('pastePreviewBox').classList.remove('hidden');
+}
+
+function convertDateToIso(d) {
+  if (!d) return null;
+  var m = d.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (m) {
+    var dd = m[1].padStart(2, '0');
+    var mm = m[2].padStart(2, '0');
+    return m[3] + '-' + mm + '-' + dd;
+  }
+  return null;
+}
+
+function confirmBulkImport() {
+  var classId = document.getElementById('classSelect').value;
+  if (!classId) { showToast('Chưa chọn lớp'); return; }
+  importNextStudent(0, classId);
+}
+
+function importNextStudent(index, classId) {
+  if (index >= pendingBulkStudents.length) {
+    showToast('Đã tạo ' + pendingBulkStudents.length + ' tài khoản');
+    document.getElementById('pasteArea').value = '';
+    document.getElementById('pastePreviewBox').classList.add('hidden');
+    pendingBulkStudents = [];
+    loadStudents();
+    return;
+  }
+  var item = pendingBulkStudents[index];
+  generateUniqueUsername(item.name, function(username) {
+    var record = {
+      class_id: classId,
+      name: item.name,
+      username: username,
+      password: '123456',
+      dob: item.dob,
+      parent_name: item.parentName || null,
+      parent_phone: item.phone || null
+    };
+    supabaseClient.from('sp_students').insert(record).then(function(res) {
+      importNextStudent(index + 1, classId);
+    });
+  });
+}
+
+// =====================================================
+// UTIL
+// =====================================================
+var eyeIcon = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>';
+var eyeOffIcon = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a18.6 18.6 0 0 1 4.22-5.19M9.9 4.24A10.4 10.4 0 0 1 12 4c7 0 11 7 11 7a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+
+function togglePw(inputId, btnId) {
+  var el = document.getElementById(inputId);
+  var btn = document.getElementById(btnId);
+  if (el.type === 'password') {
+    el.type = 'text';
+    btn.innerHTML = eyeOffIcon;
+  } else {
+    el.type = 'password';
+    btn.innerHTML = eyeIcon;
+  }
+}
+
+function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function showToast(msg) {
+  var box = document.getElementById('toastBox');
+  var el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = msg;
+  box.innerHTML = '';
+  box.appendChild(el);
+  setTimeout(function() {
+    if (el.parentNode) el.parentNode.removeChild(el);
+  }, 3000);
+}
+
+// =====================================================
+// ASSIGNMENTS
+// =====================================================
+var selectedAssignmentImage = null;
+var currentAssignmentsList = [];
+var assignmentClassesList = [];
+var assignmentClassesInKhoi = [];
+
+function loadClassesForAssignments() {
+  supabaseClient.from('sp_classes').select('*').order('created_at', { ascending: true })
+    .then(function(res) {
+      if (res.error) { showToast('Lỗi tải lớp: ' + res.error.message); return; }
+      assignmentClassesList = res.data || [];
+      onAssignmentAudienceChange();
+    });
+}
+
+function prefillTopicWithDate() {
+  var topicInput = document.getElementById('newAssignmentTopic');
+  if (topicInput.value.trim()) return; // đã có nội dung thì không ghi đè
+  var todayD = new Date();
+  var dd = String(todayD.getDate()).padStart(2, '0');
+  var mm = String(todayD.getMonth() + 1).padStart(2, '0');
+  var yyyy = todayD.getFullYear();
+  topicInput.value = dd + '/' + mm + '/' + yyyy + ' - ';
+}
+
+function onAssignmentAudienceChange() {
+  prefillTopicWithDate();
+  var audience = document.getElementById('assignmentAudienceSelect').value;
+  var isIelts = audience === 'ielts';
+  var isElementary = audience === 'elementary';
+  var generalGroup = document.getElementById('optgroupGeneral');
+  var ieltsGroup = document.getElementById('optgroupIelts');
+  var typeSelect = document.getElementById('newAssignmentType');
+  var note = document.getElementById('assignmentClassAudienceNote');
+
+  generalGroup.style.display = isIelts ? 'none' : '';
+  ieltsGroup.style.display = isIelts ? '' : 'none';
+  typeSelect.value = isIelts ? 'ielts_part2' : 'presentation';
+
+  note.textContent = isIelts
+    ? 'Khối IELTS → chỉ hiện các loại bài IELTS Part 1/2/3.'
+    : 'Khối ' + audienceLevelLabel(audience) + ' → chỉ hiện 3 loại bài thường (Thuyết trình/Từ vựng/Luyện đọc).';
+
+  onAssignmentTypeChange();
+
+  assignmentClassesInKhoi = [];
+  for (var i = 0; i < assignmentClassesList.length; i++) {
+    var lvl = assignmentClassesList[i].audience_level || 'elementary';
+    if (lvl === audience) assignmentClassesInKhoi.push(assignmentClassesList[i]);
+  }
+  renderAssignmentClassCheckboxes();
+  loadAssignmentsForAudience(audience);
+}
+
+function renderAssignmentClassCheckboxes() {
+  var box = document.getElementById('assignmentClassCheckboxes');
+  if (assignmentClassesInKhoi.length === 0) {
+    box.innerHTML = '<p class="muted">Khối này chưa có lớp nào</p>';
+    document.getElementById('excludeStudentsCheckboxes').innerHTML = '<p class="muted">Chọn lớp ở trên trước để hiện danh sách học sinh</p>';
+    return;
+  }
+  var html = '';
+  for (var i = 0; i < assignmentClassesInKhoi.length; i++) {
+    var c = assignmentClassesInKhoi[i];
+    html += '<label style="display:flex;align-items:center;gap:8px;margin-bottom:10px;font-weight:normal;cursor:pointer;">';
+    html += '<input type="checkbox" value="' + c.id + '" class="assignment-class-checkbox" onchange="loadExcludeStudents()" style="width:auto;">';
+    html += '<span>' + escapeHtml(c.name) + '</span>';
+    html += '</label>';
+  }
+  box.innerHTML = html;
+  loadExcludeStudents();
+}
+
+function loadExcludeStudents() {
+  var checkboxes = document.querySelectorAll('.assignment-class-checkbox:checked');
+  var classIds = [];
+  for (var i = 0; i < checkboxes.length; i++) classIds.push(checkboxes[i].value);
+
+  var box = document.getElementById('excludeStudentsCheckboxes');
+  if (classIds.length === 0) {
+    box.innerHTML = '<p class="muted">Chọn lớp ở trên trước để hiện danh sách học sinh</p>';
+    return;
+  }
+
+  supabaseClient.from('sp_students').select('id, name, class_id').in('class_id', classIds).order('name', { ascending: true })
+    .then(function(res) {
+      if (res.error) { showToast('Lỗi tải học sinh: ' + res.error.message); return; }
+      var students = res.data || [];
+      if (students.length === 0) {
+        box.innerHTML = '<p class="muted">Lớp đã chọn chưa có học sinh nào</p>';
+        return;
+      }
+      var html = '';
+      for (var i = 0; i < students.length; i++) {
+        var s = students[i];
+        html += '<label style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-weight:normal;cursor:pointer;">';
+        html += '<input type="checkbox" value="' + s.id + '" class="exclude-student-checkbox" style="width:auto;">';
+        html += '<span>' + escapeHtml(s.name) + '</span>';
+        html += '</label>';
+      }
+      box.innerHTML = html;
+    });
+}
+
+function onAssignmentTypeChange() {
+  var type = document.getElementById('newAssignmentType').value;
+  var readingBlock = document.getElementById('readingTextBlock');
+  var questionsBlock = document.getElementById('questionsTextBlock');
+  var translationBlock = document.getElementById('translationTextBlock');
+  var topicHint = document.getElementById('topicHintText');
+  var descHint = document.getElementById('descriptionHintText');
+
+  readingBlock.classList.toggle('hidden', type !== 'reading');
+  questionsBlock.classList.toggle('hidden', type !== 'ielts_part1' && type !== 'ielts_part3');
+  translationBlock.classList.toggle('hidden', type !== 'translation');
+
+  if (type === 'ielts_part2') {
+    topicHint.textContent = '(VD: Describe a memorable trip you have taken)';
+    descHint.textContent = '(gợi ý/bullet points như thẻ Cue Card thật, VD: You should say: where you went / who you went with / what you did...)';
+  } else if (type === 'ielts_part1' || type === 'ielts_part3') {
+    topicHint.textContent = '(VD: Hobbies and Free Time)';
+    descHint.textContent = '(tùy chọn, ghi chú thêm bối cảnh nếu cần)';
+  } else if (type === 'translation') {
+    topicHint.textContent = '(VD: Ôn tập Unit 5 - Dịch câu)';
+    descHint.textContent = '(tùy chọn)';
+  } else {
+    topicHint.textContent = '(VD: So sánh 2 bức tranh Unit 2 - Playtime)';
+    descHint.textContent = '(tùy chọn)';
+  }
+}
+
+function onAssignmentImageSelected() {
+  var input = document.getElementById('assignmentImageInput');
+  if (input.files && input.files.length > 0) {
+    setAssignmentImageFile(input.files[0]);
+  } else {
+    setAssignmentImageFile(null);
+  }
+}
+
+function setAssignmentImageFile(file) {
+  var label = document.getElementById('assignmentImageLabel');
+  if (file) {
+    selectedAssignmentImage = file;
+    label.textContent = '✅ ' + (file.name || 'ảnh đã dán');
+    label.classList.add('has-file');
+  } else {
+    selectedAssignmentImage = null;
+    label.textContent = '🖼️ Bấm để chọn, dán (Ctrl+V) hoặc kéo thả ảnh vào đây';
+    label.classList.remove('has-file');
+  }
+}
+
+// Dán ảnh bằng Ctrl+V (khi đang ở trong khu vực tạo bài giao)
+document.addEventListener('paste', function(e) {
+  var assignmentCard = document.getElementById('assignmentImageLabel');
+  if (!assignmentCard) return;
+  var assignmentsTabVisible = !document.getElementById('tabAssignments').classList.contains('hidden');
+  if (!assignmentsTabVisible) return;
+  if (!e.clipboardData || !e.clipboardData.items) return;
+  for (var i = 0; i < e.clipboardData.items.length; i++) {
+    var item = e.clipboardData.items[i];
+    if (item.kind === 'file' && item.type.indexOf('image/') === 0) {
+      var file = item.getAsFile();
+      setAssignmentImageFile(file);
+      showToast('Đã dán ảnh');
+      break;
+    }
+  }
+});
+
+// Kéo thả ảnh vào ô chọn ảnh
+(function setupAssignmentDragDrop() {
+  document.addEventListener('DOMContentLoaded', function() {});
+  var label = null;
+  function bind() {
+    label = document.getElementById('assignmentImageLabel');
+    if (!label) return;
+    label.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      label.style.borderColor = '#4c6fff';
+    });
+    label.addEventListener('dragleave', function(e) {
+      label.style.borderColor = '';
+    });
+    label.addEventListener('drop', function(e) {
+      e.preventDefault();
+      label.style.borderColor = '';
+      if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        setAssignmentImageFile(e.dataTransfer.files[0]);
+      }
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bind);
+  } else {
+    bind();
+  }
+})();
+
+function addAssignment() {
+  var topic = document.getElementById('newAssignmentTopic').value.trim();
+  var description = document.getElementById('newAssignmentDescription').value.trim();
+  var gradingCriteria = document.getElementById('newAssignmentGradingCriteria').value.trim();
+  var dueDate = document.getElementById('newAssignmentDueDate').value;
+  var type = document.getElementById('newAssignmentType').value;
+  var readingText = document.getElementById('newAssignmentReadingText').value.trim();
+  var questionsText = document.getElementById('newAssignmentQuestionsText').value.trim();
+  var translationRaw = document.getElementById('newAssignmentTranslationText').value.trim();
+
+  var translationVietnamese = null;
+  var translationEnglish = null;
+  if (type === 'translation' && translationRaw) {
+    var lines = translationRaw.split('\n');
+    var viLines = [];
+    var enLines = [];
+    for (var t = 0; t < lines.length; t++) {
+      var line = lines[t].trim();
+      if (!line) continue;
+      var sepIndex = line.indexOf(' - ');
+      if (sepIndex === -1) continue; // dòng không đúng định dạng, bỏ qua
+      viLines.push(line.substring(0, sepIndex).trim());
+      enLines.push(line.substring(sepIndex + 3).trim());
+    }
+    translationVietnamese = viLines.join('\n');
+    translationEnglish = enLines.join('\n');
+  }
+
+  var checkboxes = document.querySelectorAll('.assignment-class-checkbox:checked');
+  var selectedClassIds = [];
+  for (var c = 0; c < checkboxes.length; c++) selectedClassIds.push(checkboxes[c].value);
+
+  var excludeCheckboxes = document.querySelectorAll('.exclude-student-checkbox:checked');
+  var excludedStudentIds = [];
+  for (var e = 0; e < excludeCheckboxes.length; e++) excludedStudentIds.push(excludeCheckboxes[e].value);
+
+  if (selectedClassIds.length === 0) { showToast('Chưa tick lớp nào để giao bài'); return; }
+  if (!topic) { showToast('Nhập chủ đề bài giao'); return; }
+  if (type === 'reading' && !readingText && !selectedAssignmentImage) { showToast('Loại "Luyện đọc" cần nhập nội dung bài đọc mẫu HOẶC đính kèm ảnh'); return; }
+  if ((type === 'ielts_part1' || type === 'ielts_part3') && !questionsText) { showToast('Cần nhập danh sách câu hỏi'); return; }
+  if (type === 'translation' && (!translationVietnamese || !translationEnglish)) { showToast('Cần nhập ít nhất 1 cặp câu đúng định dạng "Câu Việt - Câu Anh"'); return; }
+
+  function insertExclusionsThenFinish(assignmentId) {
+    if (excludedStudentIds.length === 0) { finishAssignmentCreation(); return; }
+    var excludeLinks = [];
+    for (var i = 0; i < excludedStudentIds.length; i++) {
+      excludeLinks.push({ assignment_id: assignmentId, student_id: excludedStudentIds[i] });
+    }
+    supabaseClient.from('sp_assignment_excluded_students').insert(excludeLinks).then(function(exRes) {
+      if (exRes.error) showToast('Lỗi lưu danh sách loại trừ: ' + exRes.error.message);
+      finishAssignmentCreation();
+    });
+  }
+
+  function finishAssignmentCreation() {
+    showToast('Đã tạo bài giao cho ' + selectedClassIds.length + ' lớp' + (excludedStudentIds.length > 0 ? ', loại trừ ' + excludedStudentIds.length + ' học sinh' : ''));
+    document.getElementById('newAssignmentTopic').value = '';
+    prefillTopicWithDate();
+    document.getElementById('newAssignmentDescription').value = '';
+    document.getElementById('newAssignmentGradingCriteria').value = '';
+    document.getElementById('newAssignmentDueDate').value = '';
+    document.getElementById('newAssignmentReadingText').value = '';
+    document.getElementById('newAssignmentQuestionsText').value = '';
+    document.getElementById('newAssignmentTranslationText').value = '';
+    setAssignmentImageFile(null);
+    document.getElementById('assignmentImageInput').value = '';
+    var checkedBoxes = document.querySelectorAll('.assignment-class-checkbox');
+    for (var k = 0; k < checkedBoxes.length; k++) checkedBoxes[k].checked = false;
+    document.getElementById('excludeStudentsCheckboxes').innerHTML = '<p class="muted">Chọn lớp ở trên trước để hiện danh sách học sinh</p>';
+    var audience = document.getElementById('assignmentAudienceSelect').value;
+    loadAssignmentsForAudience(audience);
+  }
+
+  function insertAssignment(imageUrl) {
+    supabaseClient.from('sp_assignments').insert({
+      topic: topic,
+      description: description || null,
+      grading_criteria: gradingCriteria || null,
+      due_date: dueDate || null,
+      reference_image_url: imageUrl || null,
+      type: type,
+      reading_text: type === 'reading' ? readingText : null,
+      questions_text: (type === 'ielts_part1' || type === 'ielts_part3') ? questionsText : null,
+      translation_vietnamese: translationVietnamese,
+      translation_english: translationEnglish
+    }).select().single().then(function(res) {
+      if (res.error) { showToast('Lỗi: ' + res.error.message); return; }
+      var assignmentId = res.data.id;
+      var links = [];
+      for (var i = 0; i < selectedClassIds.length; i++) {
+        links.push({ assignment_id: assignmentId, class_id: selectedClassIds[i] });
+      }
+      supabaseClient.from('sp_assignment_classes').insert(links).then(function(linkRes) {
+        if (linkRes.error) { showToast('Lỗi gán lớp: ' + linkRes.error.message); return; }
+        insertExclusionsThenFinish(assignmentId);
+      });
+    });
+  }
+
+  if (selectedAssignmentImage) {
+    var ext = (selectedAssignmentImage.name && selectedAssignmentImage.name.split('.').pop()) || 'png';
+    var path = 'assignments/' + Date.now() + '.' + ext;
+    supabaseClient.storage.from('assignment-images').upload(path, selectedAssignmentImage)
+      .then(function(uploadRes) {
+        if (uploadRes.error) { showToast('Lỗi upload ảnh: ' + uploadRes.error.message); return; }
+        var urlRes = supabaseClient.storage.from('assignment-images').getPublicUrl(path);
+        insertAssignment(urlRes.data.publicUrl);
+      });
+  } else {
+    insertAssignment(null);
+  }
+}
+
+function loadAssignmentsForAudience(audience) {
+  var classIds = [];
+  for (var i = 0; i < assignmentClassesInKhoi.length; i++) classIds.push(assignmentClassesInKhoi[i].id);
+
+  if (classIds.length === 0) { currentAssignmentsList = []; renderAssignmentsList(); return; }
+
+  supabaseClient.from('sp_assignment_classes')
+    .select('assignment_id, class_id, sp_classes(name), sp_assignments(*)')
+    .in('class_id', classIds)
+    .then(function(res) {
+      if (res.error) { showToast('Lỗi tải bài giao: ' + res.error.message); return; }
+      var rows = res.data || [];
+      var grouped = {};
+      var order = [];
+      for (var i = 0; i < rows.length; i++) {
+        var r = rows[i];
+        if (!r.sp_assignments) continue;
+        var aid = r.assignment_id;
+        if (!grouped[aid]) {
+          grouped[aid] = Object.assign({}, r.sp_assignments, { _classNames: [] });
+          order.push(aid);
+        }
+        if (r.sp_classes && r.sp_classes.name) grouped[aid]._classNames.push(r.sp_classes.name);
+      }
+      var list = [];
+      for (var j = 0; j < order.length; j++) list.push(grouped[order[j]]);
+      list.sort(function(a, b) { return new Date(b.created_at) - new Date(a.created_at); });
+      currentAssignmentsList = list;
+      renderAssignmentsList();
+    });
+}
+
+function assignmentTypeLabel(type) {
+  if (type === 'vocabulary') return 'Đọc từ vựng';
+  if (type === 'reading') return 'Luyện đọc';
+  if (type === 'translation') return 'Dịch sang tiếng Anh';
+  if (type === 'ielts_part1') return 'IELTS Part 1';
+  if (type === 'ielts_part2') return 'IELTS Part 2';
+  if (type === 'ielts_part3') return 'IELTS Part 3';
+  if (type === 'listening') return 'Nghe hiểu';
+  if (type === 'reading_comprehension') return 'Đọc hiểu';
+  return 'Thuyết trình';
+}
+
+function renderAssignmentsList() {
+  var box = document.getElementById('assignmentsListBox');
+  if (currentAssignmentsList.length === 0) {
+    box.innerHTML = '<p class="muted">Khối này chưa có bài giao nào</p>';
+    return;
+  }
+  var html = '';
+  for (var i = 0; i < currentAssignmentsList.length; i++) {
+    var a = currentAssignmentsList[i];
+    html += '<div class="card" style="margin-bottom:10px;">';
+    html += '<div class="row" style="justify-content:space-between;align-items:flex-start;">';
+    html += '<div>';
+    html += '<b>' + escapeHtml(a.topic) + '</b>';
+    html += ' <span class="pill">' + assignmentTypeLabel(a.type) + '</span>';
+    if (a._classNames && a._classNames.length > 0) {
+      html += '<div class="muted" style="margin-top:6px;">Giao cho lớp: ' + escapeHtml(a._classNames.join(', ')) + '</div>';
+    }
+    html += '<div style="margin-top:8px;display:flex;align-items:center;gap:8px;">';
+    html += '<label class="muted" style="margin:0;">Hạn nộp:</label>';
+    html += '<input type="date" value="' + (a.due_date || '') + '" onchange="updateAssignmentDueDate(\'' + a.id + '\', this.value)" style="width:auto;padding:6px 8px;">';
+    html += '</div>';
+    if (a.description) html += '<div class="muted" style="margin-top:6px;white-space:pre-wrap;">' + escapeHtml(a.description) + '</div>';
+    if (a.grading_criteria) html += '<div class="muted" style="margin-top:6px;white-space:pre-wrap;">🎯 Tiêu chí chấm: ' + escapeHtml(a.grading_criteria) + '</div>';
+    if (a.reading_text) html += '<div class="muted" style="margin-top:6px;font-style:italic;white-space:pre-wrap;">Bài đọc mẫu:\n"' + escapeHtml(a.reading_text) + '"</div>';
+    if (a.translation_vietnamese && a.translation_english) {
+      var viLines2 = a.translation_vietnamese.split('\n');
+      var enLines2 = a.translation_english.split('\n');
+      var pairsPreview = '';
+      for (var pv = 0; pv < viLines2.length; pv++) {
+        pairsPreview += (viLines2[pv] || '') + ' → ' + (enLines2[pv] || '') + '\n';
+      }
+      html += '<div class="muted" style="margin-top:6px;white-space:pre-wrap;">Câu dịch (Việt → Anh):\n' + escapeHtml(pairsPreview.trim()) + '</div>';
+    }
+    if (a.questions_text) html += '<div class="muted" style="margin-top:6px;white-space:pre-wrap;">Câu hỏi:\n' + escapeHtml(a.questions_text) + '</div>';
+    html += '<button class="btn-secondary btn-sm" style="margin-top:8px;" onclick="openEditExclusionsModal(\'' + a.id + '\')">✏️ Sửa danh sách loại trừ</button>';
+    html += '</div>';
+    html += '<button class="btn-danger btn-sm" onclick="deleteAssignment(\'' + a.id + '\')">Xóa</button>';
+    html += '</div>';
+    if (a.reference_image_url) {
+      html += '<div style="margin-top:10px;">';
+      html += '<img src="' + a.reference_image_url + '" style="max-width:200px;border-radius:8px;display:block;">';
+      html += '<button class="btn-secondary btn-sm" style="margin-top:6px;" onclick="downloadAdminImage(\'' + a.reference_image_url + '\',\'bai-giao-' + a.id + '\')">⬇️ Tải ảnh</button>';
+      html += '</div>';
+    }
+    html += '</div>';
+  }
+  box.innerHTML = html;
+}
+
+var editExclusionsAssignmentId = null;
+
+function openEditExclusionsModal(assignmentId) {
+  editExclusionsAssignmentId = assignmentId;
+  var box = document.getElementById('editExclusionsListBox');
+  box.innerHTML = '<p class="muted">Đang tải...</p>';
+  document.getElementById('editExclusionsModal').classList.remove('hidden');
+
+  // Lấy danh sách lớp của bài giao này + học sinh đang bị loại trừ
+  var classesQuery = supabaseClient.from('sp_assignment_classes').select('class_id').eq('assignment_id', assignmentId);
+  var excludedQuery = supabaseClient.from('sp_assignment_excluded_students').select('student_id').eq('assignment_id', assignmentId);
+
+  Promise.all([classesQuery, excludedQuery]).then(function(resArr) {
+    var classesRes = resArr[0];
+    var excludedRes = resArr[1];
+    if (classesRes.error) { box.innerHTML = '<p class="muted">Lỗi tải dữ liệu</p>'; return; }
+    var classIds = (classesRes.data || []).map(function(r) { return r.class_id; });
+    var excludedIds = {};
+    if (!excludedRes.error) {
+      (excludedRes.data || []).forEach(function(r) { excludedIds[r.student_id] = true; });
+    }
+    if (classIds.length === 0) { box.innerHTML = '<p class="muted">Không tìm thấy lớp của bài giao này</p>'; return; }
+
+    supabaseClient.from('sp_students').select('id, name').in('class_id', classIds).order('name', { ascending: true })
+      .then(function(sRes) {
+        if (sRes.error) { box.innerHTML = '<p class="muted">Lỗi tải học sinh</p>'; return; }
+        var students = sRes.data || [];
+        if (students.length === 0) { box.innerHTML = '<p class="muted">Lớp chưa có học sinh</p>'; return; }
+        var html = '';
+        for (var i = 0; i < students.length; i++) {
+          var s = students[i];
+          var checked = excludedIds[s.id] ? ' checked' : '';
+          html += '<label style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-weight:normal;cursor:pointer;">';
+          html += '<input type="checkbox" value="' + s.id + '" class="edit-exclude-checkbox" style="width:auto;"' + checked + '>';
+          html += '<span>' + escapeHtml(s.name) + '</span>';
+          html += '</label>';
+        }
+        box.innerHTML = html;
+      });
+  });
+}
+
+function closeEditExclusionsModal() {
+  document.getElementById('editExclusionsModal').classList.add('hidden');
+  editExclusionsAssignmentId = null;
+}
+
+function saveEditedExclusions() {
+  if (!editExclusionsAssignmentId) return;
+  var checkboxes = document.querySelectorAll('.edit-exclude-checkbox:checked');
+  var newExcludedIds = [];
+  for (var i = 0; i < checkboxes.length; i++) newExcludedIds.push(checkboxes[i].value);
+
+  var assignmentId = editExclusionsAssignmentId;
+  // Xóa hết loại trừ cũ rồi ghi lại đúng danh sách mới (đơn giản, tránh so sánh phức tạp)
+  supabaseClient.from('sp_assignment_excluded_students').delete().eq('assignment_id', assignmentId).then(function(delRes) {
+    if (delRes.error) { showToast('Lỗi: ' + delRes.error.message); return; }
+    if (newExcludedIds.length === 0) {
+      showToast('Đã cập nhật danh sách loại trừ');
+      closeEditExclusionsModal();
+      return;
+    }
+    var rows = newExcludedIds.map(function(sid) { return { assignment_id: assignmentId, student_id: sid }; });
+    supabaseClient.from('sp_assignment_excluded_students').insert(rows).then(function(insRes) {
+      if (insRes.error) { showToast('Lỗi: ' + insRes.error.message); return; }
+      showToast('Đã cập nhật danh sách loại trừ');
+      closeEditExclusionsModal();
+    });
+  });
+}
+
+function updateAssignmentDueDate(assignmentId, newDate) {
+  supabaseClient.from('sp_assignments').update({ due_date: newDate || null }).eq('id', assignmentId)
+    .then(function(res) {
+      if (res.error) { showToast('Lỗi: ' + res.error.message); return; }
+      showToast(newDate ? 'Đã cập nhật hạn nộp' : 'Đã bỏ hạn nộp');
+    });
+}
+
+function deleteAssignment(id) {
+  if (!confirm('Xóa bài giao này?')) return;
+  supabaseClient.from('sp_assignments').delete().eq('id', id)
+    .then(function(res) {
+      if (res.error) { showToast('Lỗi: ' + res.error.message); return; }
+      showToast('Đã xóa bài giao');
+      var audience = document.getElementById('assignmentAudienceSelect').value;
+      loadAssignmentsForAudience(audience);
+    });
+}
+
+// =====================================================
+// RESULTS TAB
+// =====================================================
+function loadResultsClasses() {
+  supabaseClient.from('sp_classes').select('*').order('created_at', { ascending: true })
+    .then(function(res) {
+      if (res.error) { showToast('Lỗi tải lớp: ' + res.error.message); return; }
+      var classes = res.data || [];
+      var html = '';
+      for (var i = 0; i < classes.length; i++) {
+        html += '<option value="' + classes[i].id + '">' + escapeHtml(classes[i].name) + '</option>';
+      }
+      document.getElementById('resultsClassSelect').innerHTML = html;
+      document.getElementById('weeklyReportClassSelect').innerHTML = html;
+      if (classes.length > 0) loadResultsStudents();
+    });
+}
+
+function loadResultsStudents() {
+  var classId = document.getElementById('resultsClassSelect').value;
+  if (!classId) return;
+  supabaseClient.from('sp_students').select('*').eq('class_id', classId).order('name', { ascending: true })
+    .then(function(res) {
+      if (res.error) { showToast('Lỗi tải học sinh: ' + res.error.message); return; }
+      var students = res.data || [];
+      var html = '';
+      for (var i = 0; i < students.length; i++) {
+        html += '<option value="' + students[i].id + '">' + escapeHtml(students[i].name) + '</option>';
+      }
+      document.getElementById('resultsStudentSelect').innerHTML = html;
+      if (students.length > 0) loadStudentResults();
+      else document.getElementById('studentResultsBox').innerHTML = '<p class="muted">Lớp này chưa có học sinh</p>';
+    });
+}
+
+function loadStudentResults() {
+  var studentId = document.getElementById('resultsStudentSelect').value;
+  if (!studentId) return;
+  var box = document.getElementById('studentResultsBox');
+  box.innerHTML = '<p class="muted">Đang tải...</p>';
+  supabaseClient.from('sp_submissions').select('*, sp_scores(*), sp_assignments(topic,type)').eq('student_id', studentId)
+    .order('submitted_at', { ascending: false })
+    .then(function(res) {
+      if (res.error) { showToast('Lỗi tải kết quả: ' + res.error.message); return; }
+      renderStudentResults(res.data || []);
+    });
+}
+
+function renderStudentResults(list) {
+  var box = document.getElementById('studentResultsBox');
+  if (list.length === 0) { box.innerHTML = '<p class="muted">Học sinh chưa nộp bài nào</p>'; return; }
+
+  var html = '';
+  for (var i = 0; i < list.length; i++) {
+    var sub = list[i];
+    var score = sub.sp_scores ? (Array.isArray(sub.sp_scores) ? sub.sp_scores[0] : sub.sp_scores) : null;
+    var assignmentInfo = sub.sp_assignments ? (Array.isArray(sub.sp_assignments) ? sub.sp_assignments[0] : sub.sp_assignments) : null;
+    var assignmentType = assignmentInfo && assignmentInfo.type ? assignmentInfo.type : '';
+    var practiceType = sub.practice_type || '';
+    var isIelts = (assignmentType.indexOf('ielts') === 0) || (practiceType.indexOf('ielts') === 0);
+
+    html += '<div class="card" style="margin-bottom:10px;">';
+    html += '<div class="row" style="justify-content:space-between;align-items:flex-start;">';
+    html += '<div><b>' + formatDateAdmin(sub.submitted_at) + '</b>';
+    if (assignmentInfo && assignmentInfo.topic) html += ' <span class="pill">' + escapeHtml(assignmentInfo.topic) + '</span>';
+    html += '</div>';
+    html += statusBadgeAdmin(sub.status);
+    html += '</div>';
+
+    if (sub.status === 'graded' && score) {
+      var scoreLabel = score.overall_score !== null ? score.overall_score : '-';
+      scoreLabel = isIelts ? ('Band ' + scoreLabel) : (scoreLabel + '/10');
+      html += '<div style="margin-top:8px;font-size:20px;font-weight:700;color:#9db4ff;">' + scoreLabel + '</div>';
+      html += '<div style="margin-top:8px;line-height:1.6;white-space:pre-wrap;font-size:14px;">' + escapeHtml(addFeedbackIconsAdmin(score.detailed_feedback || '')) + '</div>';
+      if (score.goal_suggestion) html += '<div class="muted" style="margin-top:8px;">🎯 Mục tiêu tiếp theo: ' + escapeHtml(score.goal_suggestion) + '</div>';
+      html += '<button class="btn-secondary btn-sm" style="margin-top:10px;" onclick="analyzeSubmissionDetail(\'' + sub.id + '\', this)">📝 Phân tích chi tiết (transcript + dịch + lỗi ngữ pháp)</button>';
+      html += ' <button class="btn-secondary btn-sm" style="margin-top:10px;" onclick="retryOneSubmission(\'' + sub.id + '\', this)">🔄 Chấm lại bài này</button>';
+      html += '<div id="analysisBox_' + sub.id + '" class="hidden" style="margin-top:12px;padding:12px;background:#0f1420;border-radius:10px;border:1px solid #2a3350;"></div>';
+      html += '<div id="retryOneResult_' + sub.id + '" class="hidden muted" style="margin-top:8px;"></div>';
+    } else if (sub.status === 'invalid') {
+      html += '<div class="muted" style="margin-top:8px;">' + escapeHtml((score && score.invalid_reason) || 'Bài không hợp lệ') + '</div>';
+    } else if (sub.status === 'processing') {
+      html += '<div class="muted" style="margin-top:8px;">Đang chấm...</div>';
+      html += '<button class="btn-secondary btn-sm" style="margin-top:8px;" onclick="retryOneSubmission(\'' + sub.id + '\', this)">🔄 Chấm lại bài này</button>';
+      html += '<div id="retryOneResult_' + sub.id + '" class="hidden muted" style="margin-top:8px;"></div>';
+    } else {
+      html += '<div class="muted" style="margin-top:8px;">Có lỗi khi chấm bài này</div>';
+      html += '<button class="btn-secondary btn-sm" style="margin-top:8px;" onclick="retryOneSubmission(\'' + sub.id + '\', this)">🔄 Chấm lại bài này</button>';
+      html += '<div id="retryOneResult_' + sub.id + '" class="hidden muted" style="margin-top:8px;"></div>';
+    }
+
+    if (sub.video_url) {
+      html += '<audio controls src="' + sub.video_url + '" style="width:100%;margin-top:10px;"></audio>';
+    }
+    if (sub.reference_image_url) {
+      html += '<div style="margin-top:10px;">';
+      html += '<img src="' + sub.reference_image_url + '" style="max-width:200px;border-radius:8px;display:block;">';
+      html += '<button class="btn-secondary btn-sm" style="margin-top:6px;" onclick="downloadAdminImage(\'' + sub.reference_image_url + '\',\'de-bai-' + sub.id + '\')">⬇️ Tải ảnh</button>';
+      html += '</div>';
+    }
+    html += '</div>';
+  }
+  box.innerHTML = html;
+}
+
+function analyzeSubmissionDetail(submissionId, btn) {
+  var box = document.getElementById('analysisBox_' + submissionId);
+  btn.disabled = true;
+  btn.textContent = '⏳ Đang phân tích (có thể mất 30-60 giây)...';
+  box.classList.remove('hidden');
+  box.innerHTML = '<p class="muted">Đang gửi lên Gemini phân tích, vui lòng chờ...</p>';
+
+  supabaseClient.functions.invoke('analyze-submission', {
+    body: { submission_id: submissionId }
+  }).then(function(res) {
+    btn.disabled = false;
+    btn.textContent = '📝 Phân tích chi tiết (transcript + dịch + lỗi ngữ pháp)';
+    if (res.error) {
+      box.innerHTML = '<p style="color:#ff9db0;">Lỗi: ' + escapeHtml(res.error.message || String(res.error)) + '</p>';
+      return;
+    }
+    var payload = res.data;
+    if (!payload || payload.error) {
+      box.innerHTML = '<p style="color:#ff9db0;">Lỗi: ' + escapeHtml((payload && payload.error) || 'Không rõ lỗi') + '</p>';
+      return;
+    }
+    renderAnalysisResult(box, payload.data);
+  }).catch(function(err) {
+    btn.disabled = false;
+    btn.textContent = '📝 Phân tích chi tiết (transcript + dịch + lỗi ngữ pháp)';
+    box.innerHTML = '<p style="color:#ff9db0;">Lỗi: ' + escapeHtml(String(err)) + '</p>';
+  });
+}
+
+function renderAnalysisResult(box, data) {
+  if (!data) { box.innerHTML = '<p class="muted">Không có dữ liệu</p>'; return; }
+  var html = '';
+  html += '<p class="muted" style="margin:0 0 6px 0;">📄 Transcript (nguyên văn):</p>';
+  html += '<p style="margin:0 0 14px 0;font-style:italic;line-height:1.6;">' + escapeHtml(data.transcript || '') + '</p>';
+  html += '<p class="muted" style="margin:0 0 6px 0;">🇻🇳 Bản dịch:</p>';
+  html += '<p style="margin:0 0 14px 0;line-height:1.6;">' + escapeHtml(data.translation_vi || '') + '</p>';
+  html += '<p class="muted" style="margin:0 0 6px 0;">🔍 Phân tích lỗi chi tiết:</p>';
+  html += '<div style="margin:0 0 14px 0;white-space:pre-wrap;line-height:1.6;font-size:14px;">' + escapeHtml(data.detailed_analysis || '') + '</div>';
+
+  if (data.polished_version) {
+    html += '<p class="muted" style="margin:0 0 6px 0;">✨ Bản nâng cấp (giữ nguyên ý, nâng từ vựng/ngữ pháp):</p>';
+    html += '<div style="margin:0 0 14px 0;padding:12px;background:#171d2e;border-radius:8px;border:1px solid #4c6fff;white-space:pre-wrap;line-height:1.6;font-size:14px;">' + escapeHtml(data.polished_version) + '</div>';
+  }
+  if (data.key_phrases) {
+    html += '<p class="muted" style="margin:0 0 6px 0;">🌟 Từ/cụm từ mới đáng học:</p>';
+    html += '<div style="white-space:pre-wrap;line-height:1.6;font-size:14px;">' + escapeHtml(data.key_phrases) + '</div>';
+  }
+
+  box.innerHTML = html;
+}
+
+function retryOneSubmission(submissionId, btn) {
+  var resultBox = document.getElementById('retryOneResult_' + submissionId);
+  btn.disabled = true;
+  btn.textContent = 'Đang chấm lại...';
+  resultBox.classList.remove('hidden');
+  resultBox.textContent = 'Đang gửi lại cho Gemini, đợi khoảng 30-60 giây...';
+
+  supabaseClient.from('sp_submissions').select('*').eq('id', submissionId).single().then(function(subRes) {
+    if (subRes.error || !subRes.data) {
+      resultBox.textContent = 'Lỗi: không tìm thấy bài nộp';
+      btn.disabled = false;
+      btn.textContent = '🔄 Chấm lại bài này';
+      return;
+    }
+    fetch(SUPABASE_URL_FIXED + '/functions/v1/grade-submission', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY_FIXED,
+        'apikey': SUPABASE_ANON_KEY_FIXED
+      },
+      body: JSON.stringify({ record: subRes.data })
+    }).then(function(httpRes) {
+      return httpRes.text().then(function(rawText) {
+        var payload;
+        try { payload = JSON.parse(rawText); } catch (e) { payload = null; }
+        return { httpStatus: httpRes.status, payload: payload, rawText: rawText };
+      });
+    }).then(function(result) {
+      btn.disabled = false;
+      btn.textContent = '🔄 Chấm lại bài này';
+      if (result.httpStatus >= 400 || !result.payload || result.payload.error) {
+        var msg = (result.payload && result.payload.error) || result.rawText || ('HTTP ' + result.httpStatus);
+        resultBox.textContent = 'Lỗi: ' + msg;
+        return;
+      }
+      resultBox.textContent = 'Đã chấm xong! Bấm lại "Chọn học sinh" hoặc tải lại trang để xem điểm mới.';
+      var audience = document.getElementById('resultsStudentSelect');
+      if (audience) loadStudentResults();
+    }).catch(function(err) {
+      btn.disabled = false;
+      btn.textContent = '🔄 Chấm lại bài này';
+      resultBox.textContent = 'Lỗi: ' + String(err);
+    });
+  });
+}
+
+function retryStuckGradings() {
+  var btn = document.getElementById('retryStuckBtn');
+  var box = document.getElementById('retryStuckResultBox');
+  btn.disabled = true;
+  btn.textContent = 'Đang quét và chấm lại (có thể mất vài phút nếu nhiều bài)...';
+  box.innerHTML = '<p class="muted">Đang xử lý...</p>';
+
+  fetch(SUPABASE_URL_FIXED + '/functions/v1/retry-stuck-gradings', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + SUPABASE_ANON_KEY_FIXED,
+      'apikey': SUPABASE_ANON_KEY_FIXED
+    },
+    body: JSON.stringify({})
+  }).then(function(httpRes) {
+    return httpRes.text().then(function(rawText) {
+      var payload;
+      try { payload = JSON.parse(rawText); } catch (e) { payload = null; }
+      return { httpStatus: httpRes.status, payload: payload, rawText: rawText };
+    });
+  }).then(function(result) {
+    btn.disabled = false;
+    btn.textContent = 'Chấm lại ngay';
+    var payload = result.payload;
+
+    if (result.httpStatus >= 400 || !payload || payload.error) {
+      var msg = (payload && payload.error) || result.rawText || ('HTTP ' + result.httpStatus);
+      var html = '<p style="color:#ff9db0;">Lỗi (HTTP ' + result.httpStatus + '): ' + escapeHtml(msg) + '</p>';
+      if (payload && payload.debugSteps) {
+        html += '<pre style="white-space:pre-wrap;font-size:12px;margin-top:8px;">' + escapeHtml(payload.debugSteps.join('\n')) + '</pre>';
+      }
+      box.innerHTML = html;
+      return;
+    }
+    var html = '<p>Đã quét được <b>' + payload.retried + '</b> bài bị kẹt.</p>';
+    if (payload.results && payload.results.length > 0) {
+      html += '<div style="margin-top:10px;font-size:13px;">';
+      for (var i = 0; i < payload.results.length; i++) {
+        var r = payload.results[i];
+        var itemErrorMsg = '';
+        if (r.data && typeof r.data === 'object' && r.data.error) itemErrorMsg = r.data.error;
+        else if (typeof r.data === 'string') itemErrorMsg = r.data;
+        html += '<div class="muted" style="margin-top:4px;">ID ' + r.id + ' → HTTP ' + (r.http_status || 'lỗi') + (itemErrorMsg ? ' — ' + escapeHtml(itemErrorMsg) : '') + '</div>';
+      }
+      html += '</div>';
+    }
+    box.innerHTML = html;
+  }).catch(function(err) {
+    btn.disabled = false;
+    btn.textContent = 'Chấm lại ngay';
+    box.innerHTML = '<p style="color:#ff9db0;">Lỗi: ' + escapeHtml(String(err)) + '</p>';
+  });
+}
+
+function downloadAdminImage(url, filenameBase) {
+  fetch(url)
+    .then(function(res) { return res.blob(); })
+    .then(function(blob) {
+      var ext = (url.split('.').pop() || 'jpg').split('?')[0];
+      var a = document.createElement('a');
+      var objUrl = URL.createObjectURL(blob);
+      a.href = objUrl;
+      a.download = filenameBase + '.' + ext;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(objUrl);
+    })
+    .catch(function(err) {
+      showToast('Không tải được ảnh: ' + err.message);
+    });
+}
+
+function statusBadgeAdmin(status) {
+  if (status === 'graded') return '<span class="pill" style="background:#1e3a2a;color:#7de3a0;">Đã chấm</span>';
+  if (status === 'invalid') return '<span class="pill" style="background:#4a2030;color:#ff9db0;">Không hợp lệ</span>';
+  if (status === 'processing') return '<span class="pill" style="background:#3a3220;color:#ffcf6b;">Đang chấm</span>';
+  return '<span class="pill" style="background:#4a2030;color:#ff9db0;">Lỗi</span>';
+}
+
+function formatDateAdmin(iso) {
+  var d = new Date(iso);
+  var dd = String(d.getDate()).padStart(2, '0');
+  var mm = String(d.getMonth() + 1).padStart(2, '0');
+  var yyyy = d.getFullYear();
+  var hh = String(d.getHours()).padStart(2, '0');
+  var mi = String(d.getMinutes()).padStart(2, '0');
+  return dd + '/' + mm + '/' + yyyy + ' ' + hh + ':' + mi;
+}
+
+function addFeedbackIconsAdmin(text) {
+  if (!text) return text;
+  var iconMap = [
+    ['Nội dung:', '📝 Nội dung:'], ['Từ vựng:', '📚 Từ vựng:'], ['Ngữ pháp:', '✏️ Ngữ pháp:'],
+    ['Phát âm:', '🗣️ Phát âm:'], ['Tự tin:', '💪 Tự tin:'], ['Đọc đúng bài:', '📖 Đọc đúng bài:'],
+    ['Trôi chảy & Mạch lạc:', '🌊 Trôi chảy & Mạch lạc:'], ['Trôi chảy:', '🌊 Trôi chảy:'],
+    ['Vốn từ vựng:', '📚 Vốn từ vựng:'], ['Ngữ pháp (đa dạng & chính xác):', '✏️ Ngữ pháp (đa dạng & chính xác):'],
+    ['Lời khen:', '🌟 Lời khen:']
+  ];
+  var result = text;
+  for (var j = 0; j < iconMap.length; j++) {
+    (function(label, replacement) {
+      var escapedLabel = label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      var regex = new RegExp('(^|\\n)' + escapedLabel, 'g');
+      result = result.replace(regex, function(match, p1) { return p1 + replacement; });
+    })(iconMap[j][0], iconMap[j][1]);
+  }
+  return result;
+}
+
+// =====================================================
+// WEEKLY REPORT
+// =====================================================
+var lastWeeklyReportData = null;
+
+function getWeekRange(dateStr) {
+  var d = dateStr ? new Date(dateStr + 'T00:00:00') : new Date();
+  var day = d.getDay(); // 0=CN, 1=T2...
+  var diffToMonday = (day === 0) ? -6 : (1 - day);
+  var monday = new Date(d);
+  monday.setDate(d.getDate() + diffToMonday);
+  monday.setHours(0, 0, 0, 0);
+  var sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+  sunday.setHours(23, 59, 59, 999);
+  return { start: monday, end: sunday };
+}
+
+function formatShortDate(d) {
+  var dd = String(d.getDate()).padStart(2, '0');
+  var mm = String(d.getMonth() + 1).padStart(2, '0');
+  return dd + '/' + mm;
+}
+
+function generateWeeklyReport() {
+  var classId = document.getElementById('weeklyReportClassSelect').value;
+  var weekDateInput = document.getElementById('weeklyReportWeekDate').value;
+  if (!classId) { showToast('Chưa chọn lớp'); return; }
+  if (!weekDateInput) { showToast('Chưa chọn ngày trong tuần cần xem'); return; }
+
+  var box = document.getElementById('weeklyReportBox');
+  box.innerHTML = '<p class="muted">Đang tạo báo cáo...</p>';
+  document.getElementById('exportExcelBtn').classList.add('hidden');
+
+  var thisWeek = getWeekRange(weekDateInput);
+  var prevWeekDate = new Date(thisWeek.start);
+  prevWeekDate.setDate(prevWeekDate.getDate() - 7);
+  var prevWeek = getWeekRange(prevWeekDate.toISOString().slice(0, 10));
+
+  supabaseClient.from('sp_students').select('id, name').eq('class_id', classId)
+    .then(function(studentsRes) {
+      if (studentsRes.error) { showToast('Lỗi tải học sinh: ' + studentsRes.error.message); return; }
+      var students = studentsRes.data || [];
+      var studentIds = students.map(function(s) { return s.id; });
+      if (studentIds.length === 0) { box.innerHTML = '<p class="muted">Lớp chưa có học sinh</p>'; return; }
+
+      var thisWeekQuery = supabaseClient.from('sp_submissions')
+        .select('student_id, submitted_at, status, sp_scores(overall_score, short_summary)')
+        .in('student_id', studentIds)
+        .eq('status', 'graded')
+        .gte('submitted_at', thisWeek.start.toISOString())
+        .lte('submitted_at', thisWeek.end.toISOString());
+
+      var prevWeekQuery = supabaseClient.from('sp_submissions')
+        .select('student_id, sp_scores(overall_score)')
+        .in('student_id', studentIds)
+        .eq('status', 'graded')
+        .gte('submitted_at', prevWeek.start.toISOString())
+        .lte('submitted_at', prevWeek.end.toISOString());
+
+      Promise.all([thisWeekQuery, prevWeekQuery]).then(function(results) {
+        var thisRes = results[0];
+        var prevRes = results[1];
+        if (thisRes.error) { showToast('Lỗi: ' + thisRes.error.message); return; }
+
+        var byStudent = {};
+        var thisRows = thisRes.data || [];
+        for (var i = 0; i < thisRows.length; i++) {
+          var r = thisRows[i];
+          var sid = r.student_id;
+          if (!byStudent[sid]) byStudent[sid] = { subs: [], sumScore: 0, count: 0, days: {} };
+          var sc = r.sp_scores ? (Array.isArray(r.sp_scores) ? r.sp_scores[0] : r.sp_scores) : null;
+          var scoreVal = sc && sc.overall_score !== null ? sc.overall_score : null;
+          byStudent[sid].subs.push({ date: r.submitted_at, score: scoreVal, summary: sc ? sc.short_summary : '' });
+          if (scoreVal !== null) { byStudent[sid].sumScore += scoreVal; byStudent[sid].count++; }
+          byStudent[sid].days[r.submitted_at.slice(0, 10)] = true;
+        }
+
+        var prevAvgByStudent = {};
+        var prevRows = (prevRes && !prevRes.error) ? (prevRes.data || []) : [];
+        var prevSum = {}, prevCount = {};
+        for (var j = 0; j < prevRows.length; j++) {
+          var pr = prevRows[j];
+          var psc = pr.sp_scores ? (Array.isArray(pr.sp_scores) ? pr.sp_scores[0] : pr.sp_scores) : null;
+          if (psc && psc.overall_score !== null) {
+            prevSum[pr.student_id] = (prevSum[pr.student_id] || 0) + psc.overall_score;
+            prevCount[pr.student_id] = (prevCount[pr.student_id] || 0) + 1;
+          }
+        }
+        for (var sid2 in prevSum) prevAvgByStudent[sid2] = prevSum[sid2] / prevCount[sid2];
+
+        var reportData = [];
+        for (var k = 0; k < students.length; k++) {
+          var st = students[k];
+          var data = byStudent[st.id];
+          if (!data || data.subs.length === 0) continue; // chỉ báo cáo học sinh đã nộp bài
+
+          data.subs.sort(function(a, b) { return new Date(a.date) - new Date(b.date); });
+          var avgScore = data.count > 0 ? Math.round((data.sumScore / data.count) * 10) / 10 : null;
+          var prevAvg = prevAvgByStudent[st.id] !== undefined ? Math.round(prevAvgByStudent[st.id] * 10) / 10 : null;
+          var activeDays = Object.keys(data.days).length;
+
+          reportData.push({
+            studentName: st.name,
+            totalSubs: data.subs.length,
+            activeDays: activeDays,
+            avgScore: avgScore,
+            prevAvg: prevAvg,
+            subs: data.subs
+          });
+        }
+
+        lastWeeklyReportData = {
+          weekStart: thisWeek.start,
+          weekEnd: thisWeek.end,
+          rows: reportData
+        };
+        renderWeeklyReport(lastWeeklyReportData);
+        if (reportData.length > 0) document.getElementById('exportExcelBtn').classList.remove('hidden');
+      });
+    });
+}
+
+function renderWeeklyReport(data) {
+  var box = document.getElementById('weeklyReportBox');
+  if (data.rows.length === 0) {
+    box.innerHTML = '<p class="muted">Không có học sinh nào nộp bài trong tuần này (' + formatShortDate(data.weekStart) + ' - ' + formatShortDate(data.weekEnd) + ')</p>';
+    return;
+  }
+  var html = '<p class="muted">Tuần ' + formatShortDate(data.weekStart) + ' - ' + formatShortDate(data.weekEnd) + '</p>';
+  for (var i = 0; i < data.rows.length; i++) {
+    var row = data.rows[i];
+    html += '<div class="card" style="margin-bottom:10px;">';
+    html += '<b>' + escapeHtml(row.studentName) + '</b>';
+    html += '<div class="muted" style="margin-top:4px;">Tổng số bài nộp: ' + row.totalSubs + ' (nộp trong ' + row.activeDays + '/7 ngày)</div>';
+    if (row.avgScore !== null) {
+      var trend = '';
+      if (row.prevAvg !== null) {
+        trend = row.avgScore > row.prevAvg ? ' (↑ so với ' + row.prevAvg + ' tuần trước)'
+          : (row.avgScore < row.prevAvg ? ' (↓ so với ' + row.prevAvg + ' tuần trước)' : ' (= tuần trước)');
+      }
+      html += '<div style="margin-top:4px;">📊 Điểm trung bình tuần: <b>' + row.avgScore + '</b>' + trend + '</div>';
+    }
+    html += '<div style="margin-top:8px;">';
+    for (var j = 0; j < row.subs.length; j++) {
+      var s = row.subs[j];
+      var d = new Date(s.date);
+      html += '<div class="muted" style="margin-top:4px;font-size:13px;">📅 ' + formatShortDate(d) + ' — ' + escapeHtml(s.summary || (s.score !== null ? ('Điểm: ' + s.score) : '')) + '</div>';
+    }
+    html += '</div>';
+    html += '</div>';
+  }
+  box.innerHTML = html;
+}
+
+function exportWeeklyReportExcel() {
+  if (!lastWeeklyReportData || lastWeeklyReportData.rows.length === 0) { showToast('Chưa có dữ liệu báo cáo'); return; }
+  if (typeof XLSX === 'undefined') { showToast('Chưa tải được thư viện xuất Excel, thử lại sau'); return; }
+
+  var data = lastWeeklyReportData;
+  var sheetRows = [];
+  sheetRows.push(['Học sinh', 'Số bài nộp', 'Số ngày hoạt động', 'Điểm TB tuần', 'Điểm TB tuần trước', 'Ngày', 'Tóm tắt']);
+
+  for (var i = 0; i < data.rows.length; i++) {
+    var row = data.rows[i];
+    if (row.subs.length === 0) {
+      sheetRows.push([row.studentName, row.totalSubs, row.activeDays, row.avgScore, row.prevAvg, '', '']);
+    } else {
+      for (var j = 0; j < row.subs.length; j++) {
+        var s = row.subs[j];
+        var d = new Date(s.date);
+        sheetRows.push([
+          j === 0 ? row.studentName : '',
+          j === 0 ? row.totalSubs : '',
+          j === 0 ? row.activeDays : '',
+          j === 0 ? row.avgScore : '',
+          j === 0 ? row.prevAvg : '',
+          formatShortDate(d),
+          s.summary || ''
+        ]);
+      }
+    }
+  }
+
+  var ws = XLSX.utils.aoa_to_sheet(sheetRows);
+  var wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Báo cáo tuần');
+  var fileName = 'bao-cao-tuan-' + formatShortDate(data.weekStart).replace('/', '-') + '_' + formatShortDate(data.weekEnd).replace('/', '-') + '.xlsx';
+  XLSX.writeFile(wb, fileName);
+}
+
+initApp();
+</script>
+</body>
+</html>
