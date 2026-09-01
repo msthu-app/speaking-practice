@@ -13,20 +13,21 @@
   body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-    background: #0f1420;
-    color: #e8ebf2;
+    font-size: 17px;
+    background: #ffffff;
+    color: #1a1a1a;
     min-height: 100vh;
   }
   .wrap { max-width: 720px; margin: 0 auto; padding: 16px; }
   .card {
-    background: #171d2e;
-    border: 1px solid #2a3350;
+    background: #f4f5f8;
+    border: 1px solid #d5d8e0;
     border-radius: 12px;
     padding: 18px;
     margin-bottom: 14px;
   }
-  h1 { font-size: 20px; margin: 0 0 4px 0; }
-  h2 { font-size: 16px; margin: 0 0 12px 0; color: #9db4ff; }
+  h1 { font-size: 25px; margin: 0 0 4px 0; }
+  h2 { font-size: 19px; margin: 0 0 12px 0; color: #2952cc; }
   .banner-title {
     background: linear-gradient(135deg, #ff8a4c, #ff6b6b);
     color: #fff;
@@ -49,38 +50,38 @@
     color: #fff;
     border: none;
   }
-  p.sub { color: #8891a8; margin: 0 0 20px 0; font-size: 14px; }
+  p.sub { color: #5a5f70; margin: 0 0 20px 0; font-size: 16px; }
   input[type=text], input[type=password], select {
-    background: #0f1420;
-    border: 1px solid #2a3350;
-    color: #e8ebf2;
+    background: #ffffff;
+    border: 1px solid #d5d8e0;
+    color: #1a1a1a;
     border-radius: 8px;
     padding: 12px;
     width: 100%;
-    font-size: 15px;
+    font-size: 18px;
   }
   input:-webkit-autofill,
   input:-webkit-autofill:hover,
   input:-webkit-autofill:focus {
-    -webkit-text-fill-color: #e8ebf2;
-    -webkit-box-shadow: 0 0 0px 1000px #0f1420 inset;
-    box-shadow: 0 0 0px 1000px #0f1420 inset;
+    -webkit-text-fill-color: #1a1a1a;
+    -webkit-box-shadow: 0 0 0px 1000px #ffffff inset;
+    box-shadow: 0 0 0px 1000px #ffffff inset;
     transition: background-color 9999s ease-in-out 0s;
   }
   input:focus, select:focus { outline: 2px solid #4c6fff; border-color: #4c6fff; }
-  label { display: block; font-size: 13px; color: #9db4ff; margin-bottom: 6px; margin-top: 12px; }
+  label { display: block; font-size: 15px; color: #2952cc; margin-bottom: 6px; margin-top: 12px; }
   button {
     cursor: pointer;
     border: none;
     border-radius: 8px;
-    padding: 12px 18px;
+    padding: 13px 20px;
     font-weight: 600;
-    font-size: 15px;
+    font-size: 18px;
   }
   .btn-primary { background: #4c6fff; color: #fff; }
-  .btn-primary:disabled { background: #2a3350; color: #8891a8; cursor: not-allowed; }
-  .btn-secondary { background: #2a3350; color: #e8ebf2; }
-  .btn-sm { padding: 7px 12px; font-size: 13px; }
+  .btn-primary:disabled { background: #d5d8e0; color: #5a5f70; cursor: not-allowed; }
+  .btn-secondary { background: #d5d8e0; color: #1a1a1a; }
+  .btn-sm { padding: 8px 14px; font-size: 15px; }
   .hidden { display: none !important; }
   .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
   .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
@@ -88,24 +89,24 @@
   .pwrow input { padding-right: 40px; }
   .pw-toggle {
     position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
-    background: none; border: none; padding: 4px; color: #8891a8; cursor: pointer;
+    background: none; border: none; padding: 4px; color: #5a5f70; cursor: pointer;
   }
   #loginScreen, #setupScreen { max-width: 360px; margin: 60px auto; text-align: center; }
   .file-input-label {
     display: block;
-    border: 2px dashed #2a3350;
+    border: 2px dashed #d5d8e0;
     border-radius: 10px;
     padding: 24px 12px;
     text-align: center;
-    color: #9db4ff;
+    color: #2952cc;
     cursor: pointer;
     margin-top: 6px;
   }
-  .file-input-label.has-file { border-color: #4c6fff; color: #e8ebf2; }
+  .file-input-label.has-file { border-color: #4c6fff; color: #1a1a1a; }
   #audioFileInput { display: none; }
   .sub-item {
-    background: #0f1420;
-    border: 1px solid #232b45;
+    background: #ffffff;
+    border: 1px solid #e2e4ea;
     border-radius: 10px;
     padding: 14px;
     margin-bottom: 10px;
@@ -116,26 +117,26 @@
     display: inline-block;
     padding: 3px 10px;
     border-radius: 20px;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 600;
   }
-  .badge-processing { background: #3a3220; color: #ffcf6b; }
-  .badge-graded { background: #1e3a2a; color: #7de3a0; }
-  .badge-invalid { background: #4a2030; color: #ff9db0; }
-  .badge-error { background: #4a2030; color: #ff9db0; }
-  .score-big { font-size: 22px; font-weight: 700; color: #9db4ff; }
-  .detail-box { margin-top: 12px; padding-top: 12px; border-top: 1px solid #232b45; font-size: 14px; line-height: 1.6; white-space: pre-wrap; }
+  .badge-processing { background: #fff3cd; color: #8a6a00; }
+  .badge-graded { background: #d4f4dd; color: #1e7d46; }
+  .badge-invalid { background: #fbdde3; color: #c23052; }
+  .badge-error { background: #fbdde3; color: #c23052; }
+  .score-big { font-size: 27px; font-weight: 700; color: #2952cc; }
+  .detail-box { margin-top: 12px; padding-top: 12px; border-top: 1px solid #e2e4ea; font-size: 16px; line-height: 1.6; white-space: pre-wrap; }
   .modal-bg {
     position: fixed; inset: 0; background: rgba(0,0,0,0.6);
     display: flex; align-items: center; justify-content: center; z-index: 500; padding: 16px;
   }
-  .modal-box { background: #171d2e; border: 1px solid #2a3350; border-radius: 12px; padding: 22px; max-width: 420px; width: 100%; }
+  .modal-box { background: #f4f5f8; border: 1px solid #d5d8e0; border-radius: 12px; padding: 22px; max-width: 420px; width: 100%; }
   .toast {
     position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-    background: #23305a; color: #e8ebf2; padding: 12px 20px; border-radius: 8px;
+    background: #333747; color: #ffffff; padding: 12px 20px; border-radius: 8px;
     z-index: 999; max-width: 90%; text-align: center;
   }
-  .muted { color: #8891a8; font-size: 13px; }
+  .muted { color: #5a5f70; font-size: 15px; }
 </style>
 </head>
 <body>
@@ -177,7 +178,7 @@
       <button class="btn-gradient-blue btn-sm" id="toggleFreeModeBtn" style="margin-top:10px;padding:10px 16px;" onclick="toggleFreeMode(true)">Tự chọn nội dung luyện tập</button>
     </div>
 
-    <div class="hidden" id="noAssignmentMessage" style="padding:16px;text-align:center;color:#8891a8;">
+    <div class="hidden" id="noAssignmentMessage" style="padding:16px;text-align:center;color:#5a5f70;">
       Hiện chưa có bài giao nào. Đợi giáo viên giao bài mới nộp được nhé.
     </div>
 
@@ -208,20 +209,20 @@
         <textarea id="freeReadingTextInput" rows="4" placeholder="Dán đoạn văn con đang đọc..."></textarea>
       </div>
     </div>
-    <div id="assignmentDescriptionPreview" class="hidden" style="margin-top:10px;padding:12px;background:#0f1420;border-radius:10px;border:1px solid #2a3350;max-height:220px;overflow-y:auto;">
+    <div id="assignmentDescriptionPreview" class="hidden" style="margin-top:10px;padding:12px;background:#ffffff;border-radius:10px;border:1px solid #d5d8e0;max-height:220px;overflow-y:auto;">
       <p id="assignmentDescriptionPreviewContent" style="margin:0;line-height:1.6;white-space:pre-wrap;"></p>
     </div>
     <div id="assignmentImagePreview" class="hidden" style="margin-top:10px;">
       <p class="muted">Ảnh đề bài của bài giao này:</p>
       <img id="assignmentImagePreviewImg" style="max-width:100%;border-radius:10px;">
     </div>
-    <div id="readingTextPreview" class="hidden" style="margin-top:10px;padding:12px;background:#0f1420;border-radius:10px;border:1px solid #2a3350;max-height:220px;overflow-y:auto;">
-      <p class="muted" id="readingTextPreviewLabel" style="margin:0 0 6px 0;position:sticky;top:0;background:#0f1420;">Đọc đúng đoạn này:</p>
+    <div id="readingTextPreview" class="hidden" style="margin-top:10px;padding:12px;background:#ffffff;border-radius:10px;border:1px solid #d5d8e0;max-height:220px;overflow-y:auto;">
+      <p class="muted" id="readingTextPreviewLabel" style="margin:0 0 6px 0;position:sticky;top:0;background:#ffffff;">Đọc đúng đoạn này:</p>
       <p id="readingTextPreviewContent" style="margin:0;line-height:1.6;font-size:15px;white-space:pre-wrap;"></p>
     </div>
 
     <div id="audioSubmitBlock">
-      <div id="recordBlock" style="margin-top:20px;padding-top:16px;border-top:1px solid #232b45;">
+      <div id="recordBlock" style="margin-top:20px;padding-top:16px;border-top:1px solid #e2e4ea;">
         <label>🎙️ Đọc/nói đúng nội dung ở trên, rồi ghi âm tại đây</label>
         <div class="row" style="gap:10px;">
           <button class="btn-primary" id="recordBtn" onclick="toggleRecording()">🎙️ Bắt đầu ghi âm</button>
@@ -245,7 +246,7 @@
     </div>
 
     <div id="comprehensionQuizBlock" class="hidden" style="margin-top:16px;">
-      <div id="comprehensionContentBox" style="max-height:280px;overflow-y:auto;padding:12px;background:#0f1420;border-radius:10px;border:1px solid #2a3350;margin-bottom:14px;">
+      <div id="comprehensionContentBox" style="max-height:280px;overflow-y:auto;padding:12px;background:#ffffff;border-radius:10px;border:1px solid #d5d8e0;margin-bottom:14px;">
         <audio id="comprehensionAudio" controls class="hidden" style="width:100%;margin-bottom:10px;"></audio>
         <img id="comprehensionImage" class="hidden" style="max-width:100%;border-radius:8px;margin-bottom:10px;">
         <p id="comprehensionPassageText" style="white-space:pre-wrap;line-height:1.6;margin:0;"></p>
@@ -861,13 +862,28 @@ function submitVideo() {
       practice_type: practiceType,
       reading_text: freeReadingText || null,
       status: 'processing'
-    }).then(function(insertRes) {
+    }).select().single().then(function(insertRes) {
       statusEl.textContent = '';
       btn.disabled = false;
       if (insertRes.error) {
         showToast('Lỗi lưu bài nộp: ' + insertRes.error.message);
         return;
       }
+      // Đánh dấu "đã có người xử lý" trước để Cron (chạy mỗi 1 phút) không lỡ chấm trùng cùng lúc
+      supabaseClient.from('sp_submissions').update({ retry_count: 1 }).eq('id', insertRes.data.id).then(function() {});
+
+      // Gọi chấm điểm NGAY LẬP TỨC (không đợi hệ thống tự quét mỗi 1 phút)
+      // Nếu lệnh này lỗi/mạng gián đoạn thì cũng không sao, cron mỗi 1 phút sẽ tự bắt lại
+      fetch(SUPABASE_URL_FIXED + '/functions/v1/grade-submission', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + SUPABASE_ANON_KEY_FIXED,
+          'apikey': SUPABASE_ANON_KEY_FIXED
+        },
+        body: JSON.stringify({ record: insertRes.data })
+      }).catch(function() { /* im lặng bỏ qua, để cron xử lý sau */ });
+
       showToast('Đã nộp bài! Đang chấm, bạn có thể quay lại xem sau.');
       resetUploadForm();
       loadSubmissions();
@@ -940,7 +956,7 @@ function loadSubmissions() {
 
     submittedAssignmentIds = {};
     for (var i = 0; i < list.length; i++) {
-      if (list[i].assignment_id) submittedAssignmentIds[list[i].assignment_id] = true;
+      if (list[i].assignment_id && list[i].status !== 'invalid') submittedAssignmentIds[list[i].assignment_id] = true;
     }
     if (!compRes.error) {
       var compList = compRes.data || [];
@@ -991,7 +1007,7 @@ function renderSubmissions(list) {
     var isIeltsSub = effectiveType.indexOf('ielts') === 0;
 
     var isExpanded = !!expandedSubmissionIds[sub.id];
-    var deleteBtnHtml = sub.assignment_id ? '' : '<button class="btn-secondary btn-sm" onclick="event.stopPropagation();deleteSubmission(' + i + ')">Xóa</button>';
+    var deleteBtnHtml = (!sub.assignment_id || sub.status === 'invalid') ? '<button class="btn-secondary btn-sm" onclick="event.stopPropagation();deleteSubmission(' + i + ')">Xóa</button>' : '';
     html += '<div class="sub-item" onclick="toggleDetail(\'' + sub.id + '\')">';
     html += '<div class="sub-item-header">';
     html += '<div><b>' + dateStr + '</b></div>';
@@ -1005,7 +1021,7 @@ function renderSubmissions(list) {
       html += '<div id="detail_' + sub.id + '" class="detail-box' + (isExpanded ? '' : ' hidden') + '">' + escapeHtml(addFeedbackIcons(score.detailed_feedback || '')) + '</div>';
       if (isIeltsSub) {
         html += '<button class="btn-secondary btn-sm" style="margin-top:10px;" onclick="event.stopPropagation();analyzeSubmissionDetailStudent(\'' + sub.id + '\', this)">📝 Xem transcript + bản nâng cấp</button>';
-        html += '<div id="analysisBox_' + sub.id + '" class="hidden" style="margin-top:12px;padding:12px;background:#0f1420;border-radius:10px;border:1px solid #2a3350;"></div>';
+        html += '<div id="analysisBox_' + sub.id + '" class="hidden" style="margin-top:12px;padding:12px;background:#ffffff;border-radius:10px;border:1px solid #d5d8e0;"></div>';
       }
     } else if (sub.status === 'invalid') {
       html += '<div id="detail_' + sub.id + '" class="detail-box' + (isExpanded ? '' : ' hidden') + '">' + escapeHtml((score && score.invalid_reason) || 'Bài chưa đạt yêu cầu, vui lòng nộp lại.') + '</div>';
@@ -1062,19 +1078,19 @@ function analyzeSubmissionDetailStudent(submissionId, btn) {
     btn.disabled = false;
     btn.textContent = '📝 Xem transcript + bản nâng cấp';
     if (res.error) {
-      box.innerHTML = '<p style="color:#ff9db0;">Lỗi: ' + escapeHtml(res.error.message || String(res.error)) + '</p>';
+      box.innerHTML = '<p style="color:#c23052;">Lỗi: ' + escapeHtml(res.error.message || String(res.error)) + '</p>';
       return;
     }
     var payload = res.data;
     if (!payload || payload.error) {
-      box.innerHTML = '<p style="color:#ff9db0;">Lỗi: ' + escapeHtml((payload && payload.error) || 'Không rõ lỗi') + '</p>';
+      box.innerHTML = '<p style="color:#c23052;">Lỗi: ' + escapeHtml((payload && payload.error) || 'Không rõ lỗi') + '</p>';
       return;
     }
     renderAnalysisResultStudent(box, payload.data);
   }).catch(function(err) {
     btn.disabled = false;
     btn.textContent = '📝 Xem transcript + bản nâng cấp';
-    box.innerHTML = '<p style="color:#ff9db0;">Lỗi: ' + escapeHtml(String(err)) + '</p>';
+    box.innerHTML = '<p style="color:#c23052;">Lỗi: ' + escapeHtml(String(err)) + '</p>';
   });
 }
 
@@ -1089,7 +1105,7 @@ function renderAnalysisResultStudent(box, data) {
   html += '<div style="margin:0 0 14px 0;white-space:pre-wrap;line-height:1.6;font-size:14px;">' + escapeHtml(data.detailed_analysis || '') + '</div>';
   if (data.polished_version) {
     html += '<p class="muted" style="margin:0 0 6px 0;">✨ Bản nâng cấp (giữ nguyên ý, nâng từ vựng/ngữ pháp):</p>';
-    html += '<div style="margin:0 0 14px 0;padding:12px;background:#171d2e;border-radius:8px;border:1px solid #4c6fff;white-space:pre-wrap;line-height:1.6;font-size:14px;">' + escapeHtml(data.polished_version) + '</div>';
+    html += '<div style="margin:0 0 14px 0;padding:12px;background:#f4f5f8;border-radius:8px;border:1px solid #4c6fff;white-space:pre-wrap;line-height:1.6;font-size:14px;">' + escapeHtml(data.polished_version) + '</div>';
   }
   if (data.key_phrases) {
     html += '<p class="muted" style="margin:0 0 6px 0;">🌟 Từ/cụm từ mới đáng học:</p>';
@@ -1145,12 +1161,12 @@ function loadComprehensionQuestions(assignmentId) {
     body: { assignment_id: assignmentId }
   }).then(function(res) {
     if (res.error) {
-      document.getElementById('comprehensionQuestionsBox').innerHTML = '<p style="color:#ff9db0;">Lỗi tải câu hỏi: ' + escapeHtml(res.error.message) + '</p>';
+      document.getElementById('comprehensionQuestionsBox').innerHTML = '<p style="color:#c23052;">Lỗi tải câu hỏi: ' + escapeHtml(res.error.message) + '</p>';
       return;
     }
     var payload = res.data;
     if (!payload || payload.error) {
-      document.getElementById('comprehensionQuestionsBox').innerHTML = '<p style="color:#ff9db0;">Lỗi: ' + escapeHtml((payload && payload.error) || 'Không rõ lỗi') + '</p>';
+      document.getElementById('comprehensionQuestionsBox').innerHTML = '<p style="color:#c23052;">Lỗi: ' + escapeHtml((payload && payload.error) || 'Không rõ lỗi') + '</p>';
       return;
     }
     currentComprehensionQuestions = payload.questions || [];
@@ -1167,7 +1183,7 @@ function renderComprehensionQuestions() {
   var html = '';
   for (var i = 0; i < currentComprehensionQuestions.length; i++) {
     var q = currentComprehensionQuestions[i];
-    html += '<div style="margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid #232b45;">';
+    html += '<div style="margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid #e2e4ea;">';
     html += '<p style="font-weight:600;margin:0 0 8px 0;">Câu ' + (i + 1) + ': ' + escapeHtml(q.question_text) + '</p>';
 
     if (q.question_type === 'multiple_choice') {

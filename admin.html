@@ -14,29 +14,30 @@
   body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-    background: #0f1420;
-    color: #e8ebf2;
+    font-size: 16px;
+    background: #ffffff;
+    color: #1a1a1a;
     min-height: 100vh;
   }
   .wrap { max-width: 1100px; margin: 0 auto; padding: 20px; }
   .card {
-    background: #171d2e;
-    border: 1px solid #2a3350;
+    background: #f4f5f8;
+    border: 1px solid #d5d8e0;
     border-radius: 12px;
     padding: 20px;
     margin-bottom: 16px;
   }
-  h1 { font-size: 22px; margin: 0 0 4px 0; }
-  h2 { font-size: 17px; margin: 0 0 12px 0; color: #9db4ff; }
-  p.sub { color: #8891a8; margin: 0 0 20px 0; font-size: 14px; }
+  h1 { font-size: 26px; margin: 0 0 4px 0; }
+  h2 { font-size: 20px; margin: 0 0 12px 0; color: #2952cc; }
+  p.sub { color: #5a5f70; margin: 0 0 20px 0; font-size: 16px; }
   input, select, textarea, button {
     font-family: inherit;
-    font-size: 14px;
+    font-size: 16px;
   }
   input[type=text], input[type=password], input[type=date], select, textarea {
-    background: #0f1420;
-    border: 1px solid #2a3350;
-    color: #e8ebf2;
+    background: #ffffff;
+    border: 1px solid #d5d8e0;
+    color: #1a1a1a;
     border-radius: 8px;
     padding: 10px 12px;
     width: 100%;
@@ -45,9 +46,9 @@
   input:-webkit-autofill,
   input:-webkit-autofill:hover,
   input:-webkit-autofill:focus {
-    -webkit-text-fill-color: #e8ebf2;
-    -webkit-box-shadow: 0 0 0px 1000px #0f1420 inset;
-    box-shadow: 0 0 0px 1000px #0f1420 inset;
+    -webkit-text-fill-color: #1a1a1a;
+    -webkit-box-shadow: 0 0 0px 1000px #ffffff inset;
+    box-shadow: 0 0 0px 1000px #ffffff inset;
     transition: background-color 9999s ease-in-out 0s;
   }
   .pwrow { position: relative; }
@@ -60,11 +61,11 @@
     background: none;
     border: none;
     padding: 4px;
-    color: #8891a8;
+    color: #5a5f70;
     font-size: 13px;
     cursor: pointer;
   }
-  label { display: block; font-size: 13px; color: #9db4ff; margin-bottom: 6px; margin-top: 12px; }
+  label { display: block; font-size: 15px; color: #2952cc; margin-bottom: 6px; margin-top: 12px; }
   button {
     cursor: pointer;
     border: none;
@@ -74,11 +75,11 @@
   }
   .btn-primary { background: #4c6fff; color: #fff; }
   .btn-primary:hover { background: #3a5ce0; }
-  .btn-secondary { background: #2a3350; color: #e8ebf2; }
-  .btn-secondary:hover { background: #363f5f; }
-  .btn-danger { background: #4a2030; color: #ff9db0; }
-  .btn-danger:hover { background: #5c2840; }
-  .btn-sm { padding: 6px 10px; font-size: 12px; }
+  .btn-secondary { background: #d5d8e0; color: #1a1a1a; }
+  .btn-secondary:hover { background: #c5c9d6; }
+  .btn-danger { background: #fbdde3; color: #c23052; }
+  .btn-danger:hover { background: #f5c3cf; }
+  .btn-sm { padding: 7px 12px; font-size: 14px; }
   .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
   .grow { flex: 1; min-width: 160px; }
   #loginScreen, #setupScreen {
@@ -88,67 +89,67 @@
   }
   .hidden { display: none !important; }
   table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-  th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid #232b45; font-size: 14px; }
-  th { color: #8891a8; font-weight: 600; font-size: 12px; text-transform: uppercase; }
+  th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid #e2e4ea; font-size: 16px; }
+  th { color: #5a5f70; font-weight: 600; font-size: 13px; text-transform: uppercase; }
   .pill {
     display: inline-block;
-    background: #23305a;
-    color: #9db4ff;
+    background: #e6ebff;
+    color: #2952cc;
     padding: 3px 10px;
     border-radius: 20px;
-    font-size: 12px;
+    font-size: 14px;
   }
   .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
   .tab-btn {
-    background: #171d2e;
-    color: #8891a8;
-    border: 1px solid #2a3350;
+    background: #f4f5f8;
+    color: #5a5f70;
+    border: 1px solid #d5d8e0;
     padding: 10px 18px;
     border-radius: 8px;
   }
   .tab-btn.active { background: #4c6fff; color: #fff; border-color: #4c6fff; }
   .file-input-label {
     display: block;
-    border: 2px dashed #2a3350;
+    border: 2px dashed #d5d8e0;
     border-radius: 10px;
     padding: 24px 12px;
     text-align: center;
-    color: #9db4ff;
+    color: #2952cc;
     cursor: pointer;
     margin-top: 6px;
   }
-  .file-input-label.has-file { border-color: #4c6fff; color: #e8ebf2; }
+  .file-input-label.has-file { border-color: #4c6fff; color: #1a1a1a; }
   #assignmentImageInput { display: none; }
   #assignmentAudioInput { display: none; }
   #questionImageInput { display: none; }
   .credbox {
-    background: #0f1420;
+    background: #ffffff;
     border: 1px dashed #4c6fff;
     border-radius: 8px;
     padding: 12px;
     margin-top: 10px;
-    font-size: 14px;
+    font-size: 16px;
   }
   .toast {
     position: fixed;
     bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
-    background: #23305a;
-    color: #e8ebf2;
+    background: #333747;
+    color: #ffffff;
     padding: 12px 20px;
     border-radius: 8px;
     z-index: 999;
   }
   .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
   .searchrow { margin-bottom: 14px; }
-  .muted { color: #8891a8; font-size: 13px; }
+  .muted { color: #5a5f70; font-size: 15px; }
   .modal-bg {
     position: fixed; inset: 0; background: rgba(0,0,0,0.6);
     display: flex; align-items: center; justify-content: center; z-index: 500;
   }
   .modal-box {
-    background: #171d2e; border: 1px solid #2a3350; border-radius: 12px;
+    background: #f4f5f8; border: 1px solid #d5d8e0; border-radius: 12px;
     padding: 24px; max-width: 420px; width: 90%;
   }
 </style>
@@ -1639,12 +1640,12 @@ function renderStudentResults(list) {
     if (sub.status === 'graded' && score) {
       var scoreLabel = score.overall_score !== null ? score.overall_score : '-';
       scoreLabel = isIelts ? ('Band ' + scoreLabel) : (scoreLabel + '/10');
-      html += '<div style="margin-top:8px;font-size:20px;font-weight:700;color:#9db4ff;">' + scoreLabel + '</div>';
+      html += '<div style="margin-top:8px;font-size:20px;font-weight:700;color:#2952cc;">' + scoreLabel + '</div>';
       html += '<div style="margin-top:8px;line-height:1.6;white-space:pre-wrap;font-size:14px;">' + escapeHtml(addFeedbackIconsAdmin(score.detailed_feedback || '')) + '</div>';
       if (score.goal_suggestion) html += '<div class="muted" style="margin-top:8px;">🎯 Mục tiêu tiếp theo: ' + escapeHtml(score.goal_suggestion) + '</div>';
       html += '<button class="btn-secondary btn-sm" style="margin-top:10px;" onclick="analyzeSubmissionDetail(\'' + sub.id + '\', this)">📝 Phân tích chi tiết (transcript + dịch + lỗi ngữ pháp)</button>';
       html += ' <button class="btn-secondary btn-sm" style="margin-top:10px;" onclick="retryOneSubmission(\'' + sub.id + '\', this)">🔄 Chấm lại bài này</button>';
-      html += '<div id="analysisBox_' + sub.id + '" class="hidden" style="margin-top:12px;padding:12px;background:#0f1420;border-radius:10px;border:1px solid #2a3350;"></div>';
+      html += '<div id="analysisBox_' + sub.id + '" class="hidden" style="margin-top:12px;padding:12px;background:#ffffff;border-radius:10px;border:1px solid #d5d8e0;"></div>';
       html += '<div id="retryOneResult_' + sub.id + '" class="hidden muted" style="margin-top:8px;"></div>';
     } else if (sub.status === 'invalid') {
       html += '<div class="muted" style="margin-top:8px;">' + escapeHtml((score && score.invalid_reason) || 'Bài không hợp lệ') + '</div>';
@@ -1685,19 +1686,19 @@ function analyzeSubmissionDetail(submissionId, btn) {
     btn.disabled = false;
     btn.textContent = '📝 Phân tích chi tiết (transcript + dịch + lỗi ngữ pháp)';
     if (res.error) {
-      box.innerHTML = '<p style="color:#ff9db0;">Lỗi: ' + escapeHtml(res.error.message || String(res.error)) + '</p>';
+      box.innerHTML = '<p style="color:#c23052;">Lỗi: ' + escapeHtml(res.error.message || String(res.error)) + '</p>';
       return;
     }
     var payload = res.data;
     if (!payload || payload.error) {
-      box.innerHTML = '<p style="color:#ff9db0;">Lỗi: ' + escapeHtml((payload && payload.error) || 'Không rõ lỗi') + '</p>';
+      box.innerHTML = '<p style="color:#c23052;">Lỗi: ' + escapeHtml((payload && payload.error) || 'Không rõ lỗi') + '</p>';
       return;
     }
     renderAnalysisResult(box, payload.data);
   }).catch(function(err) {
     btn.disabled = false;
     btn.textContent = '📝 Phân tích chi tiết (transcript + dịch + lỗi ngữ pháp)';
-    box.innerHTML = '<p style="color:#ff9db0;">Lỗi: ' + escapeHtml(String(err)) + '</p>';
+    box.innerHTML = '<p style="color:#c23052;">Lỗi: ' + escapeHtml(String(err)) + '</p>';
   });
 }
 
@@ -1713,7 +1714,7 @@ function renderAnalysisResult(box, data) {
 
   if (data.polished_version) {
     html += '<p class="muted" style="margin:0 0 6px 0;">✨ Bản nâng cấp (giữ nguyên ý, nâng từ vựng/ngữ pháp):</p>';
-    html += '<div style="margin:0 0 14px 0;padding:12px;background:#171d2e;border-radius:8px;border:1px solid #4c6fff;white-space:pre-wrap;line-height:1.6;font-size:14px;">' + escapeHtml(data.polished_version) + '</div>';
+    html += '<div style="margin:0 0 14px 0;padding:12px;background:#f4f5f8;border-radius:8px;border:1px solid #4c6fff;white-space:pre-wrap;line-height:1.6;font-size:14px;">' + escapeHtml(data.polished_version) + '</div>';
   }
   if (data.key_phrases) {
     html += '<p class="muted" style="margin:0 0 6px 0;">🌟 Từ/cụm từ mới đáng học:</p>';
@@ -1798,7 +1799,7 @@ function retryStuckGradings() {
 
     if (result.httpStatus >= 400 || !payload || payload.error) {
       var msg = (payload && payload.error) || result.rawText || ('HTTP ' + result.httpStatus);
-      var html = '<p style="color:#ff9db0;">Lỗi (HTTP ' + result.httpStatus + '): ' + escapeHtml(msg) + '</p>';
+      var html = '<p style="color:#c23052;">Lỗi (HTTP ' + result.httpStatus + '): ' + escapeHtml(msg) + '</p>';
       if (payload && payload.debugSteps) {
         html += '<pre style="white-space:pre-wrap;font-size:12px;margin-top:8px;">' + escapeHtml(payload.debugSteps.join('\n')) + '</pre>';
       }
@@ -1821,7 +1822,7 @@ function retryStuckGradings() {
   }).catch(function(err) {
     btn.disabled = false;
     btn.textContent = 'Chấm lại ngay';
-    box.innerHTML = '<p style="color:#ff9db0;">Lỗi: ' + escapeHtml(String(err)) + '</p>';
+    box.innerHTML = '<p style="color:#c23052;">Lỗi: ' + escapeHtml(String(err)) + '</p>';
   });
 }
 
@@ -1846,9 +1847,9 @@ function downloadAdminImage(url, filenameBase) {
 
 function statusBadgeAdmin(status) {
   if (status === 'graded') return '<span class="pill" style="background:#1e3a2a;color:#7de3a0;">Đã chấm</span>';
-  if (status === 'invalid') return '<span class="pill" style="background:#4a2030;color:#ff9db0;">Không hợp lệ</span>';
+  if (status === 'invalid') return '<span class="pill" style="background:#fbdde3;color:#c23052;">Không hợp lệ</span>';
   if (status === 'processing') return '<span class="pill" style="background:#3a3220;color:#ffcf6b;">Đang chấm</span>';
-  return '<span class="pill" style="background:#4a2030;color:#ff9db0;">Lỗi</span>';
+  return '<span class="pill" style="background:#fbdde3;color:#c23052;">Lỗi</span>';
 }
 
 function formatDateAdmin(iso) {
