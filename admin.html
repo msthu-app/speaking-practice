@@ -1641,7 +1641,7 @@ function exportResultImageAdmin(submissionId) {
   var studentSelect = document.getElementById('resultsStudentSelect');
   var studentName = studentSelect.options[studentSelect.selectedIndex] ? studentSelect.options[studentSelect.selectedIndex].text : '';
 
-  downloadResultImage(studentName, topic, dateStr, scoreLabel, score.detailed_feedback || '');
+  downloadResultImage(studentName, topic, dateStr, scoreLabel, addFeedbackIconsAdmin(score.detailed_feedback || ''));
 }
 
 function wrapCanvasText(ctx, text, maxWidth) {
@@ -1677,7 +1677,7 @@ function downloadResultImage(studentName, topic, dateStr, scoreLabel, feedbackTe
     for (var j = 0; j < wrapped.length; j++) wrappedLines.push(wrapped[j]);
   }
 
-  var headerHeight = 210; // logo + tên hs + chủ đề + điểm
+  var headerHeight = 310; // huy hiệu + tên hs + chủ đề + điểm (layout giấy khen cao hơn bản cũ)
   var lineHeight = 30;
   var feedbackHeight = wrappedLines.length * lineHeight + 20;
   var footerHeight = 90;
@@ -1692,48 +1692,67 @@ function downloadResultImage(studentName, topic, dateStr, scoreLabel, feedbackTe
   ctx.fillStyle = '#ffffff';
   ctx.fillRect(0, 0, W, H);
 
-  // Viền khung ngoài (gradient cam-hồng)
-  var borderGrad = ctx.createLinearGradient(0, 0, W, H);
-  borderGrad.addColorStop(0, '#ff8a4c');
-  borderGrad.addColorStop(1, '#ff6b6b');
-  ctx.strokeStyle = borderGrad;
-  ctx.lineWidth = 10;
-  ctx.strokeRect(5, 5, W - 10, H - 10);
+  // Viền khung ngoài kiểu giấy khen: viền dày xanh + viền mảnh vàng bên trong, có góc trang trí
+  ctx.strokeStyle = '#1e3a8a';
+  ctx.lineWidth = 8;
+  ctx.strokeRect(12, 12, W - 24, H - 24);
+  ctx.strokeStyle = '#d4af37';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(24, 24, W - 48, H - 48);
 
-  // Dải màu trên cùng (banner)
-  var bannerGrad = ctx.createLinearGradient(0, 0, W, 0);
-  bannerGrad.addColorStop(0, '#ff8a4c');
-  bannerGrad.addColorStop(1, '#ff6b6b');
-  ctx.fillStyle = bannerGrad;
-  ctx.fillRect(10, 10, W - 20, 55);
-  ctx.fillStyle = '#ffffff';
-  ctx.font = 'bold 22px -apple-system, Arial, sans-serif';
+  // Họa tiết góc (4 góc)
+  var cornerSize = 22;
+  ctx.strokeStyle = '#d4af37';
+  ctx.lineWidth = 3;
+  var corners = [[24, 24, 1, 1], [W - 24, 24, -1, 1], [24, H - 24, 1, -1], [W - 24, H - 24, -1, -1]];
+  for (var c = 0; c < corners.length; c++) {
+    var cx = corners[c][0], cy = corners[c][1], dx = corners[c][2], dy = corners[c][3];
+    ctx.beginPath();
+    ctx.moveTo(cx + dx * cornerSize, cy);
+    ctx.lineTo(cx, cy);
+    ctx.lineTo(cx, cy + dy * cornerSize);
+    ctx.stroke();
+  }
+
+  // Huy hiệu + tiêu đề
+  ctx.fillStyle = '#1e3a8a';
+  ctx.font = 'bold 20px Georgia, "Times New Roman", serif';
   ctx.textAlign = 'center';
-  ctx.fillText('🎤 KẾT QUẢ BÀI NÓI TIẾNG ANH', W / 2, 47);
+  ctx.fillText('🏅 CHỨNG NHẬN KẾT QUẢ LUYỆN NÓI 🏅', W / 2, 62);
 
-  var y = 100;
+  ctx.strokeStyle = '#d4af37';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(W / 2 - 90, 74);
+  ctx.lineTo(W / 2 + 90, 74);
+  ctx.stroke();
+
+  var y = 125;
 
   // Tên học sinh
   ctx.fillStyle = '#1a1a1a';
-  ctx.font = 'bold 28px -apple-system, Arial, sans-serif';
+  ctx.font = 'bold 30px Georgia, "Times New Roman", serif';
   ctx.textAlign = 'center';
   ctx.fillText(studentName, W / 2, y);
   y += 32;
 
   // Chủ đề + ngày
   ctx.fillStyle = '#5a5f70';
-  ctx.font = '16px -apple-system, Arial, sans-serif';
+  ctx.font = 'italic 16px -apple-system, Arial, sans-serif';
   ctx.fillText(topic + '  •  ' + dateStr, W / 2, y);
-  y += 45;
+  y += 50;
 
-  // Điểm (khung tròn nổi bật)
+  // Điểm (khung tròn nổi bật, xanh dương)
   var scoreGrad = ctx.createLinearGradient(W / 2 - 70, y - 35, W / 2 + 70, y + 35);
-  scoreGrad.addColorStop(0, '#4c6fff');
-  scoreGrad.addColorStop(1, '#7b5cff');
+  scoreGrad.addColorStop(0, '#1e3a8a');
+  scoreGrad.addColorStop(1, '#2952cc');
   ctx.beginPath();
   ctx.arc(W / 2, y, 45, 0, Math.PI * 2);
   ctx.fillStyle = scoreGrad;
   ctx.fill();
+  ctx.strokeStyle = '#d4af37';
+  ctx.lineWidth = 3;
+  ctx.stroke();
   ctx.fillStyle = '#ffffff';
   ctx.font = 'bold 24px -apple-system, Arial, sans-serif';
   ctx.textAlign = 'center';
@@ -1761,13 +1780,13 @@ function downloadResultImage(studentName, topic, dateStr, scoreLabel, feedbackTe
   }
 
   y += 15;
-  // Chân trang: sao trang trí + tên thương hiệu
+  // Chân trang: dải ruy băng trang trí + tên thương hiệu
   ctx.textAlign = 'center';
-  ctx.font = '20px -apple-system, Arial, sans-serif';
-  ctx.fillStyle = '#ffcf6b';
-  ctx.fillText('⭐ ⭐ ⭐ ⭐ ⭐', W / 2, y);
+  ctx.font = '18px -apple-system, Arial, sans-serif';
+  ctx.fillStyle = '#d4af37';
+  ctx.fillText('🎗️ 🎗️ 🎗️ 🎗️ 🎗️', W / 2, y);
   y += 30;
-  ctx.font = '14px -apple-system, Arial, sans-serif';
+  ctx.font = 'italic 14px Georgia, "Times New Roman", serif';
   ctx.fillStyle = '#5a5f70';
   ctx.fillText('English for Kids – Học qua Trò Chơi', W / 2, y);
 
