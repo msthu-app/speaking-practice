@@ -1703,18 +1703,13 @@ function downloadResultImage(studentName, topic, dateStr, scoreLabel, feedbackTe
   ctx.fillStyle = '#ffffff';
   ctx.fillRect(0, 0, W, H);
 
-  roundRect(1, 1, W - 2, H - 2, 18);
-  ctx.strokeStyle = '#d5d8e0';
-  ctx.lineWidth = 1.5;
-  ctx.stroke();
-
   // Dải banner trên cùng, bo góc trên
   var bannerH = 80;
   var bannerGrad = ctx.createLinearGradient(0, 0, W, 0);
   bannerGrad.addColorStop(0, '#2952cc');
   bannerGrad.addColorStop(1, '#4c6fff');
   ctx.save();
-  roundRect(1, 1, W - 2, bannerH, 18);
+  roundRect(0, 0, W, bannerH + 18, 18);
   ctx.clip();
   ctx.fillStyle = bannerGrad;
   ctx.fillRect(0, 0, W, bannerH + 20);
@@ -1740,10 +1735,10 @@ function downloadResultImage(studentName, topic, dateStr, scoreLabel, feedbackTe
   ctx.fillText(topic + '   •   ' + dateStr, W / 2, y);
   y += 55;
 
-  // Điểm (khung tròn nổi bật, xanh dương)
+  // Điểm (khung tròn nổi bật, màu cam tương phản với banner xanh)
   var scoreGrad = ctx.createLinearGradient(W / 2 - 55, y - 50, W / 2 + 55, y + 50);
-  scoreGrad.addColorStop(0, '#2952cc');
-  scoreGrad.addColorStop(1, '#4c6fff');
+  scoreGrad.addColorStop(0, '#ff8a4c');
+  scoreGrad.addColorStop(1, '#ff6b6b');
   ctx.beginPath();
   ctx.arc(W / 2, y, 52, 0, Math.PI * 2);
   ctx.fillStyle = scoreGrad;
