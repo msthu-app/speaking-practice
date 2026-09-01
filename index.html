@@ -125,7 +125,7 @@
   .badge-invalid { background: #fbdde3; color: #c23052; }
   .badge-error { background: #fbdde3; color: #c23052; }
   .score-big { font-size: 27px; font-weight: 700; color: #2952cc; }
-  .detail-box { margin-top: 12px; padding-top: 12px; border-top: 1px solid #e2e4ea; font-size: 16px; line-height: 1.6; white-space: pre-wrap; }
+  .detail-box { margin-top: 12px; padding-top: 12px; border-top: 1px solid #e2e4ea; font-size: 19px; line-height: 1.7; white-space: pre-wrap; }
   .modal-bg {
     position: fixed; inset: 0; background: rgba(0,0,0,0.6);
     display: flex; align-items: center; justify-content: center; z-index: 500; padding: 16px;
@@ -942,7 +942,7 @@ function resetUploadForm() {
 // SUBMISSIONS LIST
 // =====================================================
 function loadSubmissions() {
-  var audioQuery = supabaseClient.from('sp_submissions').select('*, sp_scores(*), sp_assignments(type)').eq('student_id', currentStudent.id)
+  var audioQuery = supabaseClient.from('sp_submissions').select('*, sp_scores(*), sp_assignments(type, topic)').eq('student_id', currentStudent.id)
     .order('submitted_at', { ascending: false });
   var comprehensionQuery = supabaseClient.from('sp_comprehension_submissions').select('assignment_id').eq('student_id', currentStudent.id);
 
@@ -1019,6 +1019,7 @@ function renderSubmissions(list) {
       scoreLabel = isIeltsSub ? ('Band ' + scoreLabel) : (scoreLabel + '/10');
       html += '<div style="margin-top:8px;" class="score-big">' + scoreLabel + '</div>';
       html += '<div id="detail_' + sub.id + '" class="detail-box' + (isExpanded ? '' : ' hidden') + '">' + escapeHtml(addFeedbackIcons(score.detailed_feedback || '')) + '</div>';
+      html += '<button class="btn-secondary btn-sm" style="margin-top:10px;" onclick="event.stopPropagation();exportResultImage(\'' + sub.id + '\')">📸 Tải ảnh khoe điểm</button>';
       if (isIeltsSub) {
         html += '<button class="btn-secondary btn-sm" style="margin-top:10px;" onclick="event.stopPropagation();analyzeSubmissionDetailStudent(\'' + sub.id + '\', this)">📝 Xem transcript + bản nâng cấp</button>';
         html += '<div id="analysisBox_' + sub.id + '" class="hidden" style="margin-top:12px;padding:12px;background:#ffffff;border-radius:10px;border:1px solid #d5d8e0;"></div>';
@@ -1063,6 +1064,172 @@ function toggleDetail(submissionId) {
   el.classList.toggle('hidden');
   expandedSubmissionIds[submissionId] = !el.classList.contains('hidden');
 }
+
+// ============ VẼ ẢNH KHOE ĐIỂM (canvas, tải về máy) ============
+function exportResultImage(submissionId) {
+  var sub = null;
+  for (var i = 0; i < currentSubmissionsList.length; i++) {
+    if (currentSubmissionsList[i].id === submissionId) { sub = currentSubmissionsList[i]; break; }
+  }
+  if (!sub) return;
+  var score = sub.sp_scores ? (Array.isArray(sub.sp_scores) ? sub.sp_scores[0] : sub.sp_scores) : null;
+  if (!score) { showToast('Chưa có điểm để xuất ảnh'); return; }
+
+  var effectiveType = 'presentation';
+  if (sub.sp_assignments && sub.sp_assignments.type) effectiveType = sub.sp_assignments.type;
+  else if (sub.practice_type) effectiveType = sub.practice_type;
+  var isIeltsSub = effectiveType.indexOf('ielts') === 0;
+
+  var scoreLabel = score.overall_score !== null ? score.overall_score : '-';
+  scoreLabel = isIeltsSub ? ('Band ' + scoreLabel) : (scoreLabel + '/10');
+
+  var topic = (sub.sp_assignments && sub.sp_assignments.topic) ? sub.sp_assignments.topic : 'Luyện nói tự do';
+  var dateStr = formatDate(sub.submitted_at);
+  var studentName = currentStudent.name || '';
+
+  downloadResultImage(studentName, topic, dateStr, scoreLabel, score.detailed_feedback || '');
+}
+
+function wrapCanvasText(ctx, text, maxWidth) {
+  var words = text.split(' ');
+  var lines = [];
+  var current = '';
+  for (var i = 0; i < words.length; i++) {
+    var test = current ? (current + ' ' + words[i]) : words[i];
+    if (ctx.measureText(test).width > maxWidth && current) {
+      lines.push(current);
+      current = words[i];
+    } else {
+      current = test;
+    }
+  }
+  if (current) lines.push(current);
+  return lines;
+}
+
+function downloadResultImage(studentName, topic, dateStr, scoreLabel, feedbackText) {
+  var W = 800;
+  var padding = 50;
+  var contentWidth = W - padding * 2;
+
+  // Canvas tạm để đo chiều cao nội dung trước
+  var measureCanvas = document.createElement('canvas');
+  var mctx = measureCanvas.getContext('2d');
+  mctx.font = '17px -apple-system, Arial, sans-serif';
+  var feedbackLines = (feedbackText || '').split('\n').filter(function(l) { return l.trim(); });
+  var wrappedLines = [];
+  for (var i = 0; i < feedbackLines.length; i++) {
+    var wrapped = wrapCanvasText(mctx, feedbackLines[i], contentWidth);
+    for (var j = 0; j < wrapped.length; j++) wrappedLines.push(wrapped[j]);
+  }
+
+  var headerHeight = 210; // logo + tên hs + chủ đề + điểm
+  var lineHeight = 30;
+  var feedbackHeight = wrappedLines.length * lineHeight + 20;
+  var footerHeight = 90;
+  var H = headerHeight + feedbackHeight + footerHeight;
+
+  var canvas = document.createElement('canvas');
+  canvas.width = W;
+  canvas.height = H;
+  var ctx = canvas.getContext('2d');
+
+  // Nền trắng
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, W, H);
+
+  // Viền khung ngoài (gradient cam-hồng)
+  var borderGrad = ctx.createLinearGradient(0, 0, W, H);
+  borderGrad.addColorStop(0, '#ff8a4c');
+  borderGrad.addColorStop(1, '#ff6b6b');
+  ctx.strokeStyle = borderGrad;
+  ctx.lineWidth = 10;
+  ctx.strokeRect(5, 5, W - 10, H - 10);
+
+  // Dải màu trên cùng (banner)
+  var bannerGrad = ctx.createLinearGradient(0, 0, W, 0);
+  bannerGrad.addColorStop(0, '#ff8a4c');
+  bannerGrad.addColorStop(1, '#ff6b6b');
+  ctx.fillStyle = bannerGrad;
+  ctx.fillRect(10, 10, W - 20, 55);
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 22px -apple-system, Arial, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('🎤 KẾT QUẢ BÀI NÓI TIẾNG ANH', W / 2, 47);
+
+  var y = 100;
+
+  // Tên học sinh
+  ctx.fillStyle = '#1a1a1a';
+  ctx.font = 'bold 28px -apple-system, Arial, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(studentName, W / 2, y);
+  y += 32;
+
+  // Chủ đề + ngày
+  ctx.fillStyle = '#5a5f70';
+  ctx.font = '16px -apple-system, Arial, sans-serif';
+  ctx.fillText(topic + '  •  ' + dateStr, W / 2, y);
+  y += 45;
+
+  // Điểm (khung tròn nổi bật)
+  var scoreGrad = ctx.createLinearGradient(W / 2 - 70, y - 35, W / 2 + 70, y + 35);
+  scoreGrad.addColorStop(0, '#4c6fff');
+  scoreGrad.addColorStop(1, '#7b5cff');
+  ctx.beginPath();
+  ctx.arc(W / 2, y, 45, 0, Math.PI * 2);
+  ctx.fillStyle = scoreGrad;
+  ctx.fill();
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 24px -apple-system, Arial, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(scoreLabel, W / 2, y + 2);
+  ctx.textBaseline = 'alphabetic';
+  y += 70;
+
+  // Đường kẻ phân cách
+  ctx.strokeStyle = '#e2e4ea';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(padding, y);
+  ctx.lineTo(W - padding, y);
+  ctx.stroke();
+  y += 30;
+
+  // Nội dung nhận xét
+  ctx.textAlign = 'left';
+  ctx.font = '17px -apple-system, Arial, sans-serif';
+  ctx.fillStyle = '#1a1a1a';
+  for (var k = 0; k < wrappedLines.length; k++) {
+    ctx.fillText(wrappedLines[k], padding, y);
+    y += lineHeight;
+  }
+
+  y += 15;
+  // Chân trang: sao trang trí + tên thương hiệu
+  ctx.textAlign = 'center';
+  ctx.font = '20px -apple-system, Arial, sans-serif';
+  ctx.fillStyle = '#ffcf6b';
+  ctx.fillText('⭐ ⭐ ⭐ ⭐ ⭐', W / 2, y);
+  y += 30;
+  ctx.font = '14px -apple-system, Arial, sans-serif';
+  ctx.fillStyle = '#5a5f70';
+  ctx.fillText('English for Kids – Học qua Trò Chơi', W / 2, y);
+
+  // Tải ảnh về
+  canvas.toBlob(function(blob) {
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'ket-qua-' + studentName.replace(/\s+/g, '-') + '.png';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function() { URL.revokeObjectURL(url); }, 2000);
+  });
+}
+
 
 
 function analyzeSubmissionDetailStudent(submissionId, btn) {
