@@ -1641,7 +1641,9 @@ function exportResultImageAdmin(submissionId) {
   var studentSelect = document.getElementById('resultsStudentSelect');
   var studentName = studentSelect.options[studentSelect.selectedIndex] ? studentSelect.options[studentSelect.selectedIndex].text : '';
 
-  downloadResultImage(studentName, topic, dateStr, scoreLabel, addFeedbackIconsAdmin(score.detailed_feedback || ''));
+  var fullFeedback = addFeedbackIconsAdmin(score.detailed_feedback || '');
+  if (score.goal_suggestion) fullFeedback += '\n🎯 Mục tiêu tiếp theo: ' + score.goal_suggestion;
+  downloadResultImage(studentName, topic, dateStr, scoreLabel, fullFeedback);
 }
 
 function wrapCanvasText(ctx, text, maxWidth) {
@@ -1662,7 +1664,7 @@ function wrapCanvasText(ctx, text, maxWidth) {
 }
 
 function downloadResultImage(studentName, topic, dateStr, scoreLabel, feedbackText) {
-  var SCALE = 2; // vẽ ở độ phân giải gấp đôi để zoom/in ra không bị vỡ nét
+  var SCALE = 3; // vẽ ở độ phân giải gấp 3 để zoom/in ra không bị vỡ nét
   var W = 800;
   var padding = 55;
   var contentWidth = W - padding * 2;
@@ -1678,7 +1680,7 @@ function downloadResultImage(studentName, topic, dateStr, scoreLabel, feedbackTe
     for (var j = 0; j < wrapped.length; j++) wrappedLines.push(wrapped[j]);
   }
 
-  var headerHeight = 250;
+  var headerHeight = 340;
   var lineHeight = 32;
   var feedbackHeight = wrappedLines.length * lineHeight + 20;
   var footerHeight = 70;
@@ -1704,9 +1706,9 @@ function downloadResultImage(studentName, topic, dateStr, scoreLabel, feedbackTe
   ctx.fillRect(0, 0, W, H);
 
   // Viền mỏng bao quanh toàn ảnh
-  roundRect(1.5, 1.5, W - 3, H - 3, 18);
-  ctx.strokeStyle = '#d5d8e0';
-  ctx.lineWidth = 2;
+  roundRect(2, 2, W - 4, H - 4, 18);
+  ctx.strokeStyle = '#2952cc';
+  ctx.lineWidth = 4;
   ctx.stroke();
 
   // Dải banner trên cùng, bo góc trên
@@ -1715,7 +1717,7 @@ function downloadResultImage(studentName, topic, dateStr, scoreLabel, feedbackTe
   bannerGrad.addColorStop(0, '#2952cc');
   bannerGrad.addColorStop(1, '#4c6fff');
   ctx.save();
-  roundRect(1.5, 1.5, W - 3, bannerH, 18);
+  roundRect(2, 2, W - 4, bannerH, 18);
   ctx.clip();
   ctx.fillStyle = bannerGrad;
   ctx.fillRect(0, 0, W, bannerH + 20);
@@ -1736,8 +1738,8 @@ function downloadResultImage(studentName, topic, dateStr, scoreLabel, feedbackTe
   y += 34;
 
   // Chủ đề + ngày
-  ctx.fillStyle = '#5a5f70';
-  ctx.font = '17px -apple-system, "Segoe UI", Arial, sans-serif';
+  ctx.fillStyle = '#333333';
+  ctx.font = '600 17px -apple-system, "Segoe UI", Arial, sans-serif';
   ctx.fillText(topic + '   •   ' + dateStr, W / 2, y);
   y += 55;
 
@@ -1768,19 +1770,19 @@ function downloadResultImage(studentName, topic, dateStr, scoreLabel, feedbackTe
 
   // Nội dung nhận xét
   ctx.textAlign = 'left';
-  ctx.font = '19px -apple-system, "Segoe UI", Arial, sans-serif';
-  ctx.fillStyle = '#1a1a1a';
+  ctx.font = '600 19px -apple-system, "Segoe UI", Arial, sans-serif';
+  ctx.fillStyle = '#000000';
   for (var k = 0; k < wrappedLines.length; k++) {
     ctx.fillText(wrappedLines[k], padding, y);
     y += lineHeight;
   }
 
-  y += 20;
-  // Chân trang: tên thương hiệu, gọn nhẹ
+  y += 25;
+  // Chân trang: tên thương hiệu, nổi bật
   ctx.textAlign = 'center';
-  ctx.font = '15px -apple-system, "Segoe UI", Arial, sans-serif';
-  ctx.fillStyle = '#5a5f70';
-  ctx.fillText('English for Kids – Học qua Trò Chơi', W / 2, y);
+  ctx.font = 'bold 17px -apple-system, "Segoe UI", Arial, sans-serif';
+  ctx.fillStyle = '#2952cc';
+  // Không hiển thị thương hiệu/chân trang riêng
 
   // Tải ảnh về
   canvas.toBlob(function(blob) {
